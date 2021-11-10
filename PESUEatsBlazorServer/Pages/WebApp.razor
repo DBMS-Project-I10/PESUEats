@@ -1,0 +1,69 @@
+﻿@page "/webapp"
+
+<PageTitle>PESUEats App</PageTitle>
+
+@using Npgsql;
+
+<h3>App</h3>
+
+<MudButton OnClick="LoadData">Load data</MudButton>
+
+@if (dataLoaded)
+{
+	<p>Loaded</p>
+	<MudTable Items="@table" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>SSN</MudTh>
+        <MudTh>pno</MudTh>
+        <MudTh>hours</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="SSN">@context.Item1</MudTd>
+        <MudTd DataLabel="pno">@context.Item2</MudTd>
+        <MudTd DataLabel="hours">@context.Item3</MudTd>
+    </RowTemplate>
+	</MudTable>
+}
+
+
+@code {
+	//https://zetcode.com/csharp/postgresql/
+
+	private bool dataLoaded = false;
+
+	private IEnumerable<(String, int, float)> table = new List<(String, int, float)>();
+
+	private void LoadData()
+	{
+		table = new List<(String, int, float)>();
+
+		var cs = "Host=localhost;Username=postgres;Password=1234;Database=company";
+
+		using var con = new NpgsqlConnection(cs);
+
+		con.Open();
+
+		using var cmd = new NpgsqlCommand();
+
+		cmd.Connection = con;
+
+		cmd.CommandText = "SELECT * FROM works_on";
+
+		using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+		char[] ssn = new char[9];
+
+		while (rdr.Read())
+		{
+			rdr.GetChars(0, 0, ssn, 0, 9);
+			(String, int, float) ele = (new String(ssn), rdr.GetInt32(1), rdr.GetFloat(2));
+			table = table.Append(ele);
+		}
+
+		con.Close();
+
+		dataLoaded = true;
+
+	}
+
+}
