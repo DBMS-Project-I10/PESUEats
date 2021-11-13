@@ -2,16 +2,30 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using PESUEatsBlazorServer.Data;
 using MudBlazor.Services;
+using PESUEatsBlazorServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
+//builder.Services.AddSingleton<RestaurantsService>();
+builder.Services.AddHttpClient<PESUEatsWebAPIService>((client) =>
+{
+    client.BaseAddress = new Uri("https://localhost:7239");
+});
 builder.Services.AddMudServices();
 
 var app = builder.Build();
+
+/* TODO: Disabled Tye automatic discovery due to issues
+builder.Services.AddHttpClient<PESUEatsWebAPIService>((client) =>
+{
+    client.BaseAddress = app.Configuration.GetServiceUri("pesueatswebapi");
+});
+
+app = builder.Build();
+*/
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -1,69 +1,44 @@
 ﻿@page "/webapp"
 
+@inject PESUEatsBlazorServer.Data.PESUEatsWebAPIService PESUEatsWebAPI
+
 <PageTitle>PESUEats App</PageTitle>
 
-@using Npgsql;
+@using Npgsql
 
-<h3>App</h3>
+<MudText Typo="Typo.h2">App</MudText>
 
-<MudButton OnClick="LoadData">Load data</MudButton>
+@*<MudButton OnClick="LoadData">Load data</MudButton>*@
 
-@if (dataLoaded)
+@if (restaurants.Count() != 0)
 {
-	<p>Loaded</p>
-	<MudTable Items="@table" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
+	<MudTable Items="@restaurants" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>SSN</MudTh>
         <MudTh>pno</MudTh>
         <MudTh>hours</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="SSN">@context.Item1</MudTd>
-        <MudTd DataLabel="pno">@context.Item2</MudTd>
-        <MudTd DataLabel="hours">@context.Item3</MudTd>
+        <MudTd DataLabel="SSN">@context.Ssn</MudTd>
+        <MudTd DataLabel="pno">@context.ProjectNumber</MudTd>
+        <MudTd DataLabel="hours">@context.Hours</MudTd>
     </RowTemplate>
 	</MudTable>
+}
+else
+{
+	<p>Something's wrong</p>
 }
 
 
 @code {
-	//https://zetcode.com/csharp/postgresql/
+    //https://zetcode.com/csharp/postgresql/
 
-	private bool dataLoaded = false;
+    private IEnumerable<Restaurant> restaurants = new List<Restaurant>();
 
-	private IEnumerable<(String, int, float)> table = new List<(String, int, float)>();
-
-	private void LoadData()
-	{
-		table = new List<(String, int, float)>();
-
-		var cs = "Host=localhost;Username=postgres;Password=1234;Database=company";
-
-		using var con = new NpgsqlConnection(cs);
-
-		con.Open();
-
-		using var cmd = new NpgsqlCommand();
-
-		cmd.Connection = con;
-
-		cmd.CommandText = "SELECT * FROM works_on";
-
-		using NpgsqlDataReader rdr = cmd.ExecuteReader();
-
-		char[] ssn = new char[9];
-
-		while (rdr.Read())
-		{
-			rdr.GetChars(0, 0, ssn, 0, 9);
-			(String, int, float) ele = (new String(ssn), rdr.GetInt32(1), rdr.GetFloat(2));
-			table = table.Append(ele);
-		}
-
-		con.Close();
-
-		dataLoaded = true;
-
-	}
-
+    protected override async void OnInitialized()
+    {
+        restaurants = await PESUEatsWebAPI.GetRestaurantsAsync();
+        StateHasChanged();
+    }
 }
