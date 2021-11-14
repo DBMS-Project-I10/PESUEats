@@ -1,0 +1,88 @@
+﻿@using System.Security.Claims
+
+@inject AuthenticationStateProvider authStateProvider
+@inject PESUEatsBlazorServer.Data.PESUEatsWebAPIService PESUEatsWebAPI
+@inject IDialogService DialogService
+@inject NavigationManager NavMan
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Counter="UsernameMaxCharLimit" @bind-Value="Username"
+        HelperText="Enter your user ID" Label="Username" Variant="Variant.Text" Immediate="true"
+        Validation="@(new Func<string, IEnumerable<string>>(UsernameMaxCharCheck))" />
+        <MudTextField @bind-Value="Password" Label="Password" Variant="Variant.Text" 
+        InputType="@PasswordInput" Adornment="Adornment.End"
+        AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="passwordViewToggle" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => NavMan.NavigateTo("/signup"))"
+        EndIcon="@Icons.Material.Filled.PlusOne">Signup</MudButton>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="TryLogin"
+        EndIcon="@Icons.Material.Filled.Login">Login</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    public string Password { get; set;} = "1234";
+    public string Username { get; set;} = "Admin";
+    const int UsernameMaxCharLimit = 15;
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private async void TryLogin()
+    {
+        List<User>? users = await PESUEatsWebAPI.GetUsersAsync(Username);
+        if (users == null)
+        {
+            await DialogService.ShowMessageBox(
+            "Warning", 
+            "This user does not exist!", cancelText:"close");
+            StateHasChanged();
+        }
+        else
+        {
+            User user = users.First();
+            if (user.username.ToLower() == Username.ToLower() && user.password == Password)
+            {
+                ((PESUEatsAuthStateProvider)authStateProvider).LoginUser(user);
+                MudDialog.Close(DialogResult.Ok(true));
+                NavMan.NavigateTo("/UserProfile", false);
+            }
+            else
+            {
+                await DialogService.ShowMessageBox(
+                "Warning", 
+                "Incorrect Password!", cancelText:"close");
+                StateHasChanged();
+            }
+        }
+    }
+
+    void passwordViewToggle()
+    {
+        if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private IEnumerable<string> UsernameMaxCharCheck(string ch)
+    {
+        if (!string.IsNullOrEmpty(ch) && ch?.Length > UsernameMaxCharLimit)
+            yield return "Max 25 characters";
+    }
+
+    void Cancel() => MudDialog.Cancel();
+}

@@ -13,16 +13,16 @@
 @if (restaurants.Count() != 0)
 {
 	<MudTable Items="@restaurants" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
-    <HeaderContent>
-        <MudTh>SSN</MudTh>
-        <MudTh>pno</MudTh>
-        <MudTh>hours</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="SSN">@context.Ssn</MudTd>
-        <MudTd DataLabel="pno">@context.ProjectNumber</MudTd>
-        <MudTd DataLabel="hours">@context.Hours</MudTd>
-    </RowTemplate>
+        <HeaderContent>
+            <MudTh>SSN</MudTh>
+            <MudTh>pno</MudTh>
+            <MudTh>hours</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="SSN">@context.Ssn</MudTd>
+            <MudTd DataLabel="pno">@context.ProjectNumber</MudTd>
+            <MudTd DataLabel="hours">@context.Hours</MudTd>
+        </RowTemplate>
 	</MudTable>
 }
 else

@@ -2,7 +2,7 @@
 
 namespace PESUEatsSharedData.Models
 {
-	public record class Restaurant
+	public class Restaurant
 	{
 		[JsonPropertyName("ssn")]
 		public int Ssn { get; set; }

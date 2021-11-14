@@ -1,6 +1,10 @@
 ﻿@inherits LayoutComponentBase
 
-<PageTitle>PESUEatsBlazorServer</PageTitle>
+@inject IDialogService DialogService
+@inject AuthenticationStateProvider authStateProvider
+
+
+<PageTitle>Home - PESUEats</PageTitle>
 
 <MudThemeProvider Theme="currentTheme"/>
 <MudDialogProvider />
@@ -11,7 +15,18 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         PESUEats
         <MudSpacer/>
-        <MudButton OnClick="@((e) => DarkMode())">Toggle Dark/Light Mode</MudButton>
+        <MudButton OnClick="@((e) => DarkMode())" style="margin-left: 1pt"
+            StartIcon="@Icons.Material.Filled.LightMode" EndIcon="@Icons.Material.Filled.DarkMode"></MudButton>
+        <AuthorizeView>
+            <Authorized>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Logout"
+                EndIcon="@Icons.Material.Filled.Logout">Logout</MudButton>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenLoginDialog"
+                EndIcon="@Icons.Material.Filled.Login">Login</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu/>
@@ -35,6 +50,16 @@
     protected override void OnInitialized()
     {
         currentTheme = darkTheme;
+    }
+
+    private void OpenLoginDialog()
+    {
+        DialogService.Show<Login>("Login");
+    }
+
+    private void Logout()
+    {
+        ((PESUEatsAuthStateProvider)authStateProvider).LogoutUser();
     }
 
     void DarkMode()

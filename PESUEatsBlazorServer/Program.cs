@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 using PESUEatsBlazorServer.Data;
 using MudBlazor.Services;
 using PESUEatsBlazorServer;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,22 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 //builder.Services.AddSingleton<RestaurantsService>();
+
+// HttpClient is registered as a scoped service. (so, 1 client per user - changes across page refresh)
 builder.Services.AddHttpClient<PESUEatsWebAPIService>((client) =>
 {
     client.BaseAddress = new Uri("https://localhost:7239");
 });
 builder.Services.AddMudServices();
+builder.Services.AddScoped<AuthenticationStateProvider, PESUEatsAuthStateProvider>();
 
 var app = builder.Build();
 
-/* TODO: Disabled Tye automatic discovery due to issues
-builder.Services.AddHttpClient<PESUEatsWebAPIService>((client) =>
-{
-    client.BaseAddress = app.Configuration.GetServiceUri("pesueatswebapi");
-});
-
-app = builder.Build();
-*/
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
