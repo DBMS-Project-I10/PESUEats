@@ -3,21 +3,33 @@
 namespace PESUEatsSharedData.Models
 {
 	public class Restaurant
-	{
-		[JsonPropertyName("ssn")]
-		public int Ssn { get; set; }
+	{		
+		[JsonPropertyName("Rid")]
+		public int id { get; set; }
+	
+		[JsonPropertyName("RhasWid")]
+		public int walletid { get; set; }
 
-		[JsonPropertyName("pno")]
-		public int ProjectNumber { get; set; }
+		[JsonPropertyName("RName")]
+		public string name { get; set; }
+		
+		[JsonPropertyName("RLocation")]
+		public string location { get; set; }
+		
+		[JsonPropertyName("RRating")]
+		public float? rating { get; set; }
+		
+		[JsonPropertyName("RCuisine")]
+		public string? cuisine { get; set; }
 
-		[JsonPropertyName("hours")]
-		public float Hours { get; set; }
-
-		public Restaurant(int Ssn, int ProjectNumber, float Hours)
+		public Restaurant(int id, int walletid, string name, string location, float? rating, string? cuisine)
 		{
-			this.Ssn = Ssn;
-			this.ProjectNumber = ProjectNumber;
-			this.Hours = Hours;
+			this.id = id;
+			this.walletid = walletid;
+			this.name = name;
+			this.location = location;
+			this.rating = rating;
+			this.cuisine = cuisine;
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using Npgsql;
 using PESUEatsSharedData.Models;
 
-namespace PESUEatsWebAPI
+namespace PESUEatsWebAPI.Services
 {
     public class DBMSServices
     {
@@ -10,15 +10,6 @@ namespace PESUEatsWebAPI
             return new NpgsqlConnection($"Host=localhost;Username={username};Password={password};Database={database}");
         }
 
-        public static string charToString(char[] arr)
-        {
-            List<char> s = new List<char>();
-            foreach (char c in arr)
-            {
-                if (c != '\u0000') s.Add(c);
-            }
-            return new String(s.ToArray());
-        }
 
         private static bool setupDB()
         {
@@ -59,6 +50,14 @@ namespace PESUEatsWebAPI
             string strText = File.ReadAllText(@"SQL\setup.sql", System.Text.Encoding.UTF8);
             cmd.CommandText = strText;
             cmd.ExecuteNonQuery();
+            
+            strText = File.ReadAllText(@"SQL\create.sql", System.Text.Encoding.UTF8);
+            cmd.CommandText = strText;
+            cmd.ExecuteNonQuery();
+
+            strText = File.ReadAllText(@"SQL\insert.sql", System.Text.Encoding.UTF8);
+            cmd.CommandText = strText;
+            cmd.ExecuteNonQuery();
 
             con.Close();
 
@@ -95,7 +94,11 @@ namespace PESUEatsWebAPI
                     rdr.GetChars(0, 0, uname, 0, 15);
                     rdr.GetChars(1, 0, passwd, 0, 30);
                     rdr.GetChars(2, 0, roles, 0, 50);
-                    users.Add(new User(charToString(uname), charToString(passwd), charToString(roles).Split(",")));
+                    users.Add(new User(
+                        Helper.charToString(uname),
+                        Helper.charToString(passwd),
+                        Helper.charToString(roles).Split(",")
+                        ));
                 }
 
                 con.Close();

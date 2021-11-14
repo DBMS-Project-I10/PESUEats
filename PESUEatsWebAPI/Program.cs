@@ -1,4 +1,5 @@
 using PESUEatsWebAPI;
+using PESUEatsWebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +19,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/restaurants", RestaurantServices.GetRestuarantsList).WithName("GetRestuarantsList");
+app.MapGet("/restaurants", RestaurantServices.GetRestuarantsList).WithName("GetRestaurantList");
+app.MapGet("/menuitems", RestaurantServices.GetMenuItemList).WithName("GetMenuitemList");
+app.MapGet("/menuitemincarts", CustomerServices.GetMenuItemInCartList).WithName("GetMenuitemincartList");
+app.MapGet("/carts", OrderManagerServices.GetCartList).WithName("GetCartList");
+app.MapGet("/customers", CustomerServices.GetCustomerList).WithName("GetCustomerList");
+app.MapGet("/deliveryagents", DAServices.GetDeliveryAgentList).WithName("GetDeliveryagentList");
+app.MapGet("/foodorders", OrderManagerServices.GetFoodOrderList).WithName("GetFoodorderList");
+app.MapGet("/wallets", WalletServices.GetWalletList).WithName("GetWalletList");
+app.MapGet("/ordertransactions", WalletServices.GetOrderTransactionList).WithName("GetOrdertransactionList");
+
+
 app.MapPost("/users/{username?}", DBMSServices.GetUsers).WithName("GetUsersList");
+
 app.MapPost("/signup", DBMSServices.Signup).WithName("Signup");
 //app.MapPost("/login", DBMSServices.GetUsers).WithName("Login");
 app.MapGet("/setup", DBMSServices.Setup).WithName("Setup");

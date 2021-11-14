@@ -10,7 +10,7 @@
 
 @*<MudButton OnClick="LoadData">Load data</MudButton>*@
 
-@if (restaurants.Count() != 0)
+@*if (restaurants.Count() != 0)
 {
 	<MudTable Items="@restaurants" Hover="true" Breakpoint="Breakpoint.Sm" LoadingProgressColor="Color.Info">
         <HeaderContent>
@@ -28,7 +28,7 @@
 else
 {
 	<p>Something's wrong</p>
-}
+}*@
 
 
 @code {
@@ -38,7 +38,6 @@ else
 
     protected override async void OnInitialized()
     {
-        restaurants = await PESUEatsWebAPI.GetRestaurantsAsync();
-        StateHasChanged();
+        
     }
 }
