@@ -1,5 +1,6 @@
 from typing import ForwardRef
-from flask import Flask, helpers
+from flask import Flask, helpers, request
+from flask.wrappers import Request
 import psycopg2
 from psycopg2.extras import RealDictCursor, wait_select
 import json
@@ -27,6 +28,34 @@ def get_restaurants():
     con.close()
     return json.dumps(items, indent=2)
 
+@app.route('/menuitems')
+def get_allmenuitems():
+    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    if request.args == None:
+        cur.execute("SELECT * FROM MENU_ITEM;")
+        items = cur.fetchall()
+        cur.close()
+        con.close()
+        return json.dumps(items, indent=2)
+    
+    else:
+        print(request.args)
+        return json.dumps(request.args)
+
+
+# @app.route('/rest_menu_items')
+# def get_restaurant_menu_items():
+#     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+#     cur = con.cursor(cursor_factory=RealDictCursor)
+#     cur.execute("SELECT * FROM MENU_ITEM;")
+#     items = cur.fetchall()
+#     cur.close()
+#     con.close()
+#     return json.dumps(items, indent=2)
+
+
 @app.route('/')
 def get_menuitemincarts():
     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
@@ -36,3 +65,4 @@ def get_menuitemincarts():
     cur.close()
     con.close()
     return json.dumps(items, indent=2)
+
