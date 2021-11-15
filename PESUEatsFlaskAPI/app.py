@@ -48,17 +48,6 @@ def get_allmenuitems():
         return json.dumps(request.args)
 
 
-# @app.route('/rest_menu_items')
-# def get_restaurant_menu_items():
-#     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
-#     cur = con.cursor(cursor_factory=RealDictCursor)
-#     cur.execute("SELECT * FROM MENU_ITEM;")
-#     items = cur.fetchall()
-#     cur.close()
-#     con.close()
-#     return json.dumps(items, indent=2)
-
-
 @app.route('/menuitemincarts')
 def get_menuitemincarts():
     """
