@@ -32,11 +32,13 @@ def get_restaurants():
     return json.dumps(items, indent=2)
 
 @app.route('/menuitems')
-def get_allmenuitems():
+def get_menuitems():
     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
     cur = con.cursor(cursor_factory=RealDictCursor)
 
-    if request.args == None:
+    rid = request.args.get('rid')
+
+    if rid is None:
         cur.execute("SELECT * FROM MENU_ITEM;")
         items = cur.fetchall()
         cur.close()
@@ -44,8 +46,11 @@ def get_allmenuitems():
         return json.dumps(items, indent=2)
     
     else:
-        print(request.args)
-        return json.dumps(request.args)
+        cur.execute(f"SELECT * FROM MENU_ITEM WHERE IinMenuRid = {rid};")
+        items = cur.fetchall()
+        cur.close()
+        con.close()
+        return json.dumps(items, indent=2)
 
 
 @app.route('/menuitemincarts')
