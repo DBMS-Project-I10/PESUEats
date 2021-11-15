@@ -1,7 +1,7 @@
 ﻿@using System.Security.Claims
 
 @inject AuthenticationStateProvider authStateProvider
-@inject PESUEatsBlazorServer.Data.PESUEatsWebAPIService PESUEatsWebAPI
+@inject PESUEatsBlazorServer.Services.PESUEatsWebAPIService PESUEatsWebAPI
 @inject IDialogService DialogService
 @inject NavigationManager NavMan
 
@@ -49,9 +49,9 @@
             User user = users.First();
             if (user.username.ToLower() == Username.ToLower() && user.password == Password)
             {
-                ((PESUEatsAuthStateProvider)authStateProvider).LoginUser(user);
+                ((Services.PESUEatsAuthStateProvider)authStateProvider).LoginUser(user);
                 MudDialog.Close(DialogResult.Ok(true));
-                NavMan.NavigateTo("/UserProfile", false);
+                NavMan.NavigateTo("/app/shared/profile", false);
             }
             else
             {

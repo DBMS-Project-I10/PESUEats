@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using PESUEatsBlazorServer.Data;
+using PESUEatsBlazorServer.Services;
 using MudBlazor.Services;
 using PESUEatsBlazorServer;
 using Microsoft.AspNetCore.Components.Authorization;

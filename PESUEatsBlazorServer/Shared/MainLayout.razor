@@ -59,7 +59,7 @@
 
     private void Logout()
     {
-        ((PESUEatsAuthStateProvider)authStateProvider).LogoutUser();
+        ((Services.PESUEatsAuthStateProvider)authStateProvider).LogoutUser();
     }
 
     void DarkMode()
@@ -88,17 +88,17 @@
     {
         Palette = new Palette()
         {
-            Black = "#27272f",
-            Background = "#32333d",
-            BackgroundGrey = "#27272f",
+            Black = "#00101d",
+            Background = "#051e38",
+            BackgroundGrey = "#00101d",
             Surface = "#373740",
-            DrawerBackground = "#27272f",
-            DrawerText = "rgba(255,255,255, 0.50)",
+            DrawerBackground = "#00101d",
+            DrawerText = "rgba(255,255,255, 0.70)",
             DrawerIcon = "rgba(255,255,255, 0.50)",
-            AppbarBackground = "#27272f",
+            AppbarBackground = "#00101d",
             AppbarText = "rgba(255,255,255, 0.70)",
-            TextPrimary = "rgba(255,255,255, 0.70)",
-            TextSecondary = "rgba(255,255,255, 0.50)",
+            TextPrimary = "rgba(255,255,255, 0.90)",
+            TextSecondary = "rgba(255,255,255, 0.60)",
             ActionDefault = "#adadb1",
             ActionDisabled = "rgba(255,255,255, 0.26)",
             ActionDisabledBackground = "rgba(255,255,255, 0.12)",
@@ -107,7 +107,7 @@
             TableLines = "rgba(255,255,255, 0.12)",
             LinesDefault = "rgba(255,255,255, 0.12)",
             LinesInputs = "rgba(255,255,255, 0.3)",
-            TextDisabled = "rgba(255,255,255, 0.2)"
+            TextDisabled = "rgba(255,255,255, 0.2)",
         }
     };
 }

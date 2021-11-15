@@ -2,7 +2,7 @@
 using PESUEatsSharedData.Models;
 using System.Security.Claims;
 
-namespace PESUEatsBlazorServer
+namespace PESUEatsBlazorServer.Services
 {
     public class PESUEatsAuthStateProvider : AuthenticationStateProvider
     {

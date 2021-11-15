@@ -1,5 +1,8 @@
-﻿using Npgsql;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Npgsql;
 using PESUEatsSharedData.Models;
+using System.Dynamic;
 
 namespace PESUEatsWebAPI.Services
 {
@@ -95,6 +98,45 @@ namespace PESUEatsWebAPI.Services
             con.Close();
 
             return menuItems;
+        }
+
+        public static IResult GetMenuItemSubsetTestList()
+        {
+            //https://www.newtonsoft.com/json/help/html/ParsingLINQtoJSON.htm
+                        
+            using var con = DBMSServices.CreateConnection("postgres", "1234", "pesu_eats");
+            con.Open();
+
+            using var cmd = new NpgsqlCommand();
+            cmd.Connection = con;
+
+            cmd.CommandText = @"SELECT RName , RRating FROM RESTAURANT ;";
+
+            using NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+            /*JArray arr = new JArray();
+            while (rdr.Read())
+            {
+                arr.Add(new JObject(
+                    new JProperty("Name", $"{rdr[0]}"),
+                    new JProperty("Description", $"{rdr[1]}")
+                ));
+            }
+	        var jsonString = JsonConvert.SerializeObject(arr);
+            JArray obj = JArray.Parse(jsonString);*/
+
+            List<ExpandoObject> objs = new List<ExpandoObject>();
+            while (rdr.Read())
+            {
+                dynamic obj = new ExpandoObject();
+                obj.name = rdr[0].ToString();
+                obj.Price = Convert.ToDecimal(rdr[1].ToString());
+                objs.Add(obj);
+            }
+
+            con.Close();
+
+            return Results.Ok(objs);
         }
     }
 }

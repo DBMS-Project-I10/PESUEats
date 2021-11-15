@@ -29,6 +29,7 @@ app.MapGet("/foodorders", OrderManagerServices.GetFoodOrderList).WithName("GetFo
 app.MapGet("/wallets", WalletServices.GetWalletList).WithName("GetWalletList");
 app.MapGet("/ordertransactions", WalletServices.GetOrderTransactionList).WithName("GetOrdertransactionList");
 
+app.MapGet("/menuitemstest", RestaurantServices.GetMenuItemSubsetTestList).WithName("Test");
 
 app.MapPost("/users/{username?}", DBMSServices.GetUsers).WithName("GetUsersList");
 

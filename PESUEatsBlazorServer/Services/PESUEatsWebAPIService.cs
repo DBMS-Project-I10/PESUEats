@@ -1,7 +1,7 @@
 using PESUEatsSharedData.Models;
 using System.Text.Json;
 
-namespace PESUEatsBlazorServer.Data
+namespace PESUEatsBlazorServer.Services
 {
     public class PESUEatsWebAPIService
     {

@@ -19,6 +19,6 @@ CREATE USER OrderManager WITH PASSWORD '1234' ;
 
 INSERT INTO app_users VALUES ( 'admin' , '1234' , 'admin' ) ;
 INSERT INTO app_users VALUES ( 'tarun' , '123' , 'customer' ) ;
-INSERT INTO app_users VALUES ( 'Vibha' , '123' , 'restaurant' ) ;
-INSERT INTO app_users VALUES ( 'Vishruth' , '123' , 'da' ) ;
+INSERT INTO app_users VALUES ( 'vibha' , '123' , 'restaurant' ) ;
+INSERT INTO app_users VALUES ( 'vishruth' , '123' , 'da' ) ;
 
