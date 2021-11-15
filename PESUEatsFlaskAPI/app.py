@@ -20,6 +20,9 @@ def hello():
 
 @app.route('/restaurants')
 def get_restaurants():
+    """
+    /restaurants
+    """
     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
     cur = con.cursor(cursor_factory=RealDictCursor)
     cur.execute("SELECT * FROM RESTAURANT;")
@@ -56,8 +59,11 @@ def get_allmenuitems():
 #     return json.dumps(items, indent=2)
 
 
-@app.route('/')
+@app.route('/menuitemincarts')
 def get_menuitemincarts():
+    """
+    /menuitemincarts
+    """
     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
     cur = con.cursor(cursor_factory=RealDictCursor)
     cur.execute("SELECT * FROM MENU_ITEM_IN_CART;")
@@ -66,3 +72,41 @@ def get_menuitemincarts():
     con.close()
     return json.dumps(items, indent=2)
 
+@app.route('/customers')
+def get_customers():
+    """
+    /customers
+    """
+    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT * FROM CUSTOMER;")
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+    return json.dumps(items, indent=2)
+
+@app.route('/foodorders')
+def get_foodorders():
+    """
+    /foodorders
+    """
+    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT * FROM FOOD_ORDER;")
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+    return json.dumps(items, indent=2)
+
+@app.route('/ordertransactions')
+def get_ordertransactions():
+    """
+    /ordertransactions
+    """
+    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT * FROM ORDER_TRANSACTION;")
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+    return json.dumps(items, indent=2)
