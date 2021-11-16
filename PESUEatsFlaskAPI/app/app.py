@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor, wait_select
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, instance_relative_config=True)
 
 DEC2FLOAT = psycopg2.extensions.new_type(
     psycopg2.extensions.DECIMAL.values,
@@ -16,7 +16,7 @@ psycopg2.extensions.register_type(DEC2FLOAT)
 
 @app.route('/')
 def hello():
-    return 'Hello, World!'
+    return 'Welcome to PESU Eats API!'
 
 @app.route('/restaurants')
 def get_restaurants():
@@ -33,6 +33,10 @@ def get_restaurants():
 
 @app.route('/menuitems')
 def get_menuitems():
+    """
+    /menuitems
+    /menuitems?rid={}
+    """
     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
     cur = con.cursor(cursor_factory=RealDictCursor)
 
@@ -93,6 +97,19 @@ def get_foodorders():
     return json.dumps(items, indent=2)
 
 @app.route('/ordertransactions')
+def get_ordertransactions():
+    """
+    /ordertransactions
+    """
+    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    cur.execute("SELECT * FROM ORDER_TRANSACTION;")
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+    return json.dumps(items, indent=2)
+
+@app.route('/resetdb')
 def get_ordertransactions():
     """
     /ordertransactions
