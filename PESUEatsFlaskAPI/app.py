@@ -40,17 +40,14 @@ def get_menuitems():
 
     if rid is None:
         cur.execute("SELECT * FROM MENU_ITEM;")
-        items = cur.fetchall()
-        cur.close()
-        con.close()
-        return json.dumps(items, indent=2)
     
     else:
         cur.execute(f"SELECT * FROM MENU_ITEM WHERE IinMenuRid = {rid};")
-        items = cur.fetchall()
-        cur.close()
-        con.close()
-        return json.dumps(items, indent=2)
+    
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+    return json.dumps(items, indent=2)
 
 
 @app.route('/menuitemincarts')
@@ -104,3 +101,56 @@ def get_ordertransactions():
     cur.close()
     con.close()
     return json.dumps(items, indent=2)
+
+
+@app.route('/customer')
+def get_customer():
+    """
+    /ordertransactions
+    """
+    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    cid = request.args.get('cid')
+    cname = request.args.get('cname')
+
+    if cid is None and cname is None:
+        cur.execute("SELECT * FROM CUSTOMER;")
+    
+    elif cname is None:
+        cur.execute(f"SELECT * FROM CUSTOMER WHERE CustId = {cid};")
+    
+    else:
+        cur.execute(f"SELECT * FROM CUSTOMER WHERE CustName = '{cname}';")
+    
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+    return json.dumps(items, indent=2)
+
+@app.route('/deliveryagent')
+def get_da():
+    """
+    /ordertransactions
+    """
+    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    daid = request.args.get('daid')
+    daname = request.args.get('daname')
+
+    if daid is None and daname is None:
+        cur.execute("SELECT * FROM DELIVERY_AGENT;")
+    
+    elif daname is None:
+        cur.execute(f"SELECT * FROM DELIVERY_AGENT WHERE CustId = {daid};")
+    
+    else:
+        cur.execute(f"SELECT * FROM DELIVERY_AGENT WHERE CustName = '{daname}';")
+    
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+    return json.dumps(items, indent=2)
+
+
