@@ -1,9 +1,9 @@
 from typing import ForwardRef
-from flask import Flask, helpers, request
+from flask import Flask, helpers, request, Response, jsonify, json
 from flask.wrappers import Request
 import psycopg2
 from psycopg2.extras import RealDictCursor, wait_select
-import json
+# import json
 
 
 DEC2FLOAT = psycopg2.extensions.new_type(
@@ -30,7 +30,12 @@ def create_app(test_config=None):
         items = cur.fetchall()
         cur.close()
         con.close()
-        return json.dumps(items, indent=2)
+        
+        response = app.response_class(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json'
+        )
+        return response
 
     @app.route('/menuitems')
     def get_menuitems():
@@ -45,44 +50,87 @@ def create_app(test_config=None):
 
         if rid is None:
             cur.execute("SELECT * FROM MENU_ITEM;")
-            items = cur.fetchall()
-            cur.close()
-            con.close()
-            return json.dumps(items, indent=2)
         
         else:
             cur.execute(f"SELECT * FROM MENU_ITEM WHERE IinMenuRid = {rid};")
-            items = cur.fetchall()
-            cur.close()
-            con.close()
-            return json.dumps(items, indent=2)
+        
+        items = cur.fetchall()
+        cur.close()
+        con.close()
+
+        response = app.response_class(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json'
+        )
+        return response
+        return json.dumps(items, indent=2)
 
 
     @app.route('/menuitemincarts')
     def get_menuitemincarts():
         """
         /menuitemincarts
+
+        /menuitemincarts?cartid=<cartid>
         """
         con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
         cur = con.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM MENU_ITEM_IN_CART;")
+
+        cartid = request.args.get('cartid')
+        if cartid is None:
+            cur.execute("SELECT * FROM MENU_ITEM_IN_CART;")
+        
+        else:
+            cur.execute(f"SELECT * FROM MENU_ITEM_IN_CART WHERE MICartId = {cartid};")
+        
         items = cur.fetchall()
         cur.close()
         con.close()
+
+        response = app.response_class(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json'
+        )
+        return response
         return json.dumps(items, indent=2)
 
-    @app.route('/customers')
-    def get_customers():
+
+    @app.route('/customer')
+    def get_customer():
         """
-        /customers
+        /customer
+
+        /customer?cid=<cid>
+
+        /customer?cname=<cname>
         """
         con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
         cur = con.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM CUSTOMER;")
+
+        cid = request.args.get('cid')
+        cname = request.args.get('cname')
+
+        if cid is None and cname is None:
+            cur.execute("SELECT * FROM CUSTOMER;")
+        
+        elif cname is None:
+            cur.execute(f"SELECT * FROM CUSTOMER WHERE CustId = {cid};")
+        
+        else:
+            cur.execute(f"SELECT * FROM CUSTOMER WHERE CustName = '{cname}';")
+        
         items = cur.fetchall()
         cur.close()
         con.close()
+
+        response = app.response_class(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json'
+        )
+        return response
+
         return json.dumps(items, indent=2)
+        
 
     @app.route('/foodorders')
     def get_foodorders():
@@ -95,6 +143,13 @@ def create_app(test_config=None):
         items = cur.fetchall()
         cur.close()
         con.close()
+
+        response = app.response_class(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json'
+        )
+        return response
+
         return json.dumps(items, indent=2)
 
     @app.route('/ordertransactions')
@@ -108,19 +163,66 @@ def create_app(test_config=None):
         items = cur.fetchall()
         cur.close()
         con.close()
+
+        response = app.response_class(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json'
+        )
+        return response
+
         return json.dumps(items, indent=2)
 
-    @app.route('/resetdb')
-    def resetdb():
+    # @app.route('/resetdb')
+    # def resetdb():
+    #     """
+    #     /resetdb
+    #     """
+    #     con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+    #     cur = con.cursor(cursor_factory=RealDictCursor)
+    #     cur.execute("SELECT * FROM ORDER_TRANSACTION;")
+    #     items = cur.fetchall()
+    #     cur.close()
+    #     con.close()
+
+    #     response = app.response_class(
+    #         response=json.dumps(items, indent=2),
+    #         mimetype='application/json'
+    #     )
+    #     return response
+
+        return json.dumps(items, indent=2)
+
+
+    @app.route('/deliveryagent')
+    def get_da():
         """
-        /ordertransactions
+        /deliveryagent
         """
         con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
         cur = con.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM ORDER_TRANSACTION;")
+
+        daid = request.args.get('daid')
+        daname = request.args.get('daname')
+
+        if daid is None and daname is None:
+            cur.execute("SELECT * FROM DELIVERY_AGENT;")
+        
+        elif daname is None:
+            cur.execute(f"SELECT * FROM DELIVERY_AGENT WHERE CustId = {daid};")
+        
+        else:
+            cur.execute(f"SELECT * FROM DELIVERY_AGENT WHERE CustName = '{daname}';")
+        
         items = cur.fetchall()
         cur.close()
         con.close()
+
+        response = app.response_class(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json'
+        )
+        return response
         return json.dumps(items, indent=2)
 
     return app
+
