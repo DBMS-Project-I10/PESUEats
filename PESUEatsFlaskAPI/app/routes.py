@@ -339,11 +339,12 @@ def addtocart():
     cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {reqbody["custid"]}, {quantity});')
     con.commit() 
 
+    cur.close()
+    con.close()
+    
     response = Response(
             response=json.dumps({"message": "Successfully added to cart"}),
             mimetype='application/json',
             status=200
         )
     return response
-
-
