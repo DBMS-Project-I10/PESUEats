@@ -2,7 +2,33 @@ from flask import request, jsonify
 from functools import wraps
 import jwt
 
-from app.app import app
+
+import psycopg2
+import configparser
+
+class AppConfig:
+    """
+    class containing the config state by reading the config.ini file
+    """
+    config = None
+
+    def __init__(self):
+        self.config = configparser.ConfigParser()
+        self.config.read('config.ini')
+
+appconfig = AppConfig()
+
+def get_pg_conn(*, dbname=None, user=None, host=None):
+    if dbname is None:
+        dbname = appconfig.config['POSTGRES']['dbname']
+    if user is None:
+        user = appconfig.config['POSTGRES']['user']
+    if host is None:
+        host = appconfig.config['POSTGRES']['host']
+
+    con = psycopg2.connect(dbname=dbname, user=user, host=host)
+    return con
+
 
 # def token_required(f):
 #     @wraps(f)

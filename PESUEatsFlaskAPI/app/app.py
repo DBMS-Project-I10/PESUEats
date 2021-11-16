@@ -1,10 +1,9 @@
 from typing import ForwardRef
-from flask import Flask, helpers, request, Response, jsonify, json
-from flask.wrappers import Request
+from flask import Flask, request, json
 import psycopg2
-from psycopg2.extras import RealDictCursor, wait_select
-# import json
+from psycopg2.extras import RealDictCursor
 
+from app.helper import get_pg_conn
 
 DEC2FLOAT = psycopg2.extensions.new_type(
     psycopg2.extensions.DECIMAL.values,
@@ -24,7 +23,7 @@ def create_app(test_config=None):
         """
         /restaurants
         """
-        con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+        con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
         cur.execute("SELECT * FROM RESTAURANT;")
         items = cur.fetchall()
@@ -43,7 +42,7 @@ def create_app(test_config=None):
         /menuitems
         /menuitems?rid={}
         """
-        con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+        con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         rid = request.args.get('rid')
@@ -73,7 +72,7 @@ def create_app(test_config=None):
 
         /menuitemincarts?cartid=<cartid>
         """
-        con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+        con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         cartid = request.args.get('cartid')
@@ -104,7 +103,7 @@ def create_app(test_config=None):
 
         /customer?cname=<cname>
         """
-        con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+        con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         cid = request.args.get('cid')
@@ -137,7 +136,7 @@ def create_app(test_config=None):
         """
         /foodorders
         """
-        con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+        con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
         cur.execute("SELECT * FROM FOOD_ORDER;")
         items = cur.fetchall()
@@ -157,7 +156,7 @@ def create_app(test_config=None):
         """
         /ordertransactions
         """
-        con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+        con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
         cur.execute("SELECT * FROM ORDER_TRANSACTION;")
         items = cur.fetchall()
@@ -190,7 +189,6 @@ def create_app(test_config=None):
     #     )
     #     return response
 
-        return json.dumps(items, indent=2)
 
 
     @app.route('/deliveryagent')
@@ -198,7 +196,7 @@ def create_app(test_config=None):
         """
         /deliveryagent
         """
-        con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
+        con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         daid = request.args.get('daid')
