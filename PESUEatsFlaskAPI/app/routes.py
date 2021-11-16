@@ -305,3 +305,45 @@ def signup():
     cur.close()
     con.close()
     return response
+
+@api_bp.route('/addtocart', methods=["POST"])
+def addtocart():
+    reqbody = request.json 
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    if 'custid' not in reqbody.keys() and 'itemid' not in reqbody.keys():
+        response = Response(
+            response=json.dumps({"message": "CustId and ItemId not present"}),
+            mimetype='application/json',
+            status=400
+        )
+        return response
+
+    # cartid = None
+    # Creating new cart if not present
+    if 'cartid' not in reqbody.keys():
+        cur.execute(f'update cart set CartStatus = "INACTIVE" where cartcustid = {reqbody.custid};')
+        # TODO: Figure out how to add cartids
+        cur.execute(f'insert into cart values (  , {reqbody.custid}, "ACTIVE", 0, 0, 0) returning cartid')
+        cartid = cur.fetchone()['cartid']
+        con.commit() 
+    else:
+        cartid = reqbody["cartid"] 
+    
+    if 'quantity' in reqbody.keys():
+        quantity = reqbody['quantity']
+    else:
+        quantity = 1
+
+    cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {reqbody["custid"]}, {quantity});')
+    con.commit() 
+
+    response = Response(
+            response=json.dumps({"message": "Successfully added to cart"}),
+            mimetype='application/json',
+            status=200
+        )
+    return response
+
+
