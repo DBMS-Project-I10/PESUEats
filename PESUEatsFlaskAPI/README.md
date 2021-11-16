@@ -12,7 +12,9 @@
    source variables.sh
    ```
 
-3. Start the flask app server by running
+3. Configurate the app by editing `config.ini`
+
+4. Start the flask app server by running
 
    ```shell
    flask run
