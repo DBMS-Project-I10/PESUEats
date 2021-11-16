@@ -348,3 +348,36 @@ def addtocart():
             status=200
         )
     return response
+
+@api_bp.route('/showcart')
+def showcart():
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    custid = request.args.get('custid')
+    cartid = request.args.get('cartid')
+
+    if cartid is None and custid is None:
+        response = Response(
+            response=json.dumps({"message": "CustId and CartId not present"}),
+            mimetype='application/json',
+            status=400
+        )
+        return response
+        
+    if cartid is not None:
+        cur.execute(f'SELECT Iid, Iname, Iprice, MIQuantity FROM MENU_ITEM m, MENU_ITEM_IN_CART mc WHERE m.Iid = mc.MIid AND mc.MICartId = {cartid};')
+        res = cur.fetchall() 
+        response = Response(
+            response=json.dumps(res),
+            mimetype='application/json',
+            status=200
+        )
+        return response
+    
+    # Add logic for handling if onlu custid passed and cartid not passed. Find the activate cart for that customer 
+    else: 
+        pass
+
+    cur.close()
+    con.close()
