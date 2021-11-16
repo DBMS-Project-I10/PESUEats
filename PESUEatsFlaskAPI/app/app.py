@@ -67,19 +67,6 @@ def get_menuitemincarts():
     con.close()
     return json.dumps(items, indent=2)
 
-@app.route('/customers')
-def get_customers():
-    """
-    /customers
-    """
-    con = psycopg2.connect(dbname='pesu_eats', user='postgres', host='localhost')
-    cur = con.cursor(cursor_factory=RealDictCursor)
-    cur.execute("SELECT * FROM CUSTOMER;")
-    items = cur.fetchall()
-    cur.close()
-    con.close()
-    return json.dumps(items, indent=2)
-
 @app.route('/foodorders')
 def get_foodorders():
     """
