@@ -16,6 +16,7 @@ class AppConfig:
         self.config = configparser.ConfigParser()
         self.config.read('config.ini')
 
+
 appconfig = AppConfig()
 
 def get_pg_conn(*, dbname=None, user=None, host=None):
@@ -29,6 +30,8 @@ def get_pg_conn(*, dbname=None, user=None, host=None):
     con = psycopg2.connect(dbname=dbname, user=user, host=host)
     return con
 
+def is_init():
+    return appconfig.config['APP_CONFIG']['init']
 
 # def token_required(f):
 #     @wraps(f)
