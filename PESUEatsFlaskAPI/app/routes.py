@@ -209,7 +209,7 @@ def signup():
     """
     user_details = request.json
 
-    # Check if json format correct
+    # Check if necessary fields in post request
     if not ({'email', 'phone', 'name', 'password'} <= user_details.keys()):
         response = Response(
             response=json.dumps({
@@ -220,6 +220,7 @@ def signup():
         )
         return response
 
+    # Make sure phone number can be converted to int
     phone = None
     try:
         phone = int(user_details['phone'])
@@ -235,8 +236,7 @@ def signup():
 
     # Check if email already registered (we will use 
     # only email and not phone number) for simplicity
-
-    # TODO: add roles to con
+    # TODO: add roles to pg con?
     con = get_pg_conn()
 
     cur = con.cursor(cursor_factory=RealDictCursor)
@@ -262,24 +262,26 @@ def signup():
         cur.execute(query)
         wid = cur.fetchone()['wid']
         
-
+        # Insert new user into customer
         query = f"""INSERT INTO CUSTOMER VALUES (
             default, {wid}, null, {phone}, 
             '{addr}', '{user_details['name']}', '{user_details['email']}'
         );"""
         cur.execute(query)
         
+        # Insert into app users
         # TODO: add custom roles?
         query = f"""INSERT INTO APP_USERS VALUES (
             '{user_details['email']}',
             '{user_details['password']}',
             'customer'
         );"""
-
         cur.execute(query)
+
+        # Commit changes
         con.commit()
 
-
+        # Return the customer record inserted
         query = f"""SELECT CUSTPHONE, CUSTADDR, CUSTNAME, CUSTEMAIL FROM CUSTOMER 
             WHERE CUSTEMAIL = '{user_details['email']}';
         """
