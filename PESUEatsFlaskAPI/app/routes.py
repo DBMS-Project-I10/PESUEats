@@ -58,6 +58,33 @@ def get_menuitems():
     return json.dumps(items, indent=2)
 
 
+@api_bp.route('/cartinfo')
+def get_cart_info():
+    """
+    """
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    cartid = request.args.get('cartid')
+
+    if cartid is None:
+        cur.execute("SELECT * FROM CART;")
+    
+    else:
+        cur.execute(f"SELECT * FROM CART WHERE CartId = {cartid};")
+    
+    items = cur.fetchall()
+    cur.close()
+    con.close()
+
+    response = Response(
+        response=json.dumps(items, indent=2),
+        mimetype='application/json'
+    )
+    return response
+    return json.dumps(items, indent=2)
+
+
 @api_bp.route('/menuitemincarts')
 def get_menuitemincarts():
     """
@@ -323,9 +350,10 @@ def addtocart():
     # cartid = None
     # Creating new cart if not present
     if 'cartid' not in reqbody.keys():
-        cur.execute(f'update cart set CartStatus = "INACTIVE" where cartcustid = {reqbody.custid};')
+        cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {reqbody['custid']};''')
         # TODO: Figure out how to add cartids
-        cur.execute(f'insert into cart values (  , {reqbody.custid}, "ACTIVE", 0, 0, 0) returning cartid')
+        # cur.execute(f'''insert into cart values (default, {reqbody.custid}, 'ACTIVE', 0, 0, 0) returning cartid''')
+        cur.execute(f'''insert into cart values (1, {reqbody['custid']}, 'ACTIVE', 0, 0, 0) returning cartid''')
         cartid = cur.fetchone()['cartid']
         con.commit() 
     else:
@@ -336,14 +364,18 @@ def addtocart():
     else:
         quantity = 1
 
+    #TODO : Figure out how to validate all items being added to cart are from the same restaurant (Might use Triggers and Functions)
+
     cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {reqbody["custid"]}, {quantity});')
+
+    #TODO IMP: Make a trigger and function to calculate tax amount and total amount of cart and update total amount
     con.commit() 
 
     cur.close()
     con.close()
     
     response = Response(
-            response=json.dumps({"message": "Successfully added to cart"}),
+            response=json.dumps({"message": "Successfully added to cart", "cartid": cartid}),
             mimetype='application/json',
             status=200
         )
@@ -375,9 +407,66 @@ def showcart():
         )
         return response
     
-    # Add logic for handling if onlu custid passed and cartid not passed. Find the activate cart for that customer 
+    # Add logic for handling if onlu custid passed and cartid not passed. Find the active cart for that customer 
     else: 
         pass
 
     cur.close()
     con.close()
+
+@api_bp.route('/placeorder', methods=["POST"])
+def placeorder():
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    custid = request.args.get('custid')
+    cartid = request.args.get('cartid')
+
+    if cartid is None and custid is None:
+        response = Response(
+            response=json.dumps({"message": "CustId and CartId not present"}),
+            mimetype='application/json',
+            status=400
+        )
+        return response
+        
+    if cartid is None:
+        cartid = cur.execute(f'SELECT cartid FROM CART WHERE cartcustid = {custid} and cartstatus = "ACTIVE";')
+
+    #Get Restaurant Id
+    cur.execute(f'SELECT IinMenuRid from MENU_ITEM_IN_CART mc, MENU_ITEM m where micartid = {cartid} and micartcustid = {custid} and mc.miid = m.iid;')
+    rid = cur.fetchone()['iinmenurid']
+
+    # Find free DAs 
+    cur.execute(f'''SELECT DISTINCT DAId from DELIVERY_AGENT EXCEPT SELECT DISTINCT ODAId FROM FOOD_ORDER WHERE Ostatus != 'DELIVERED'; ''')
+    #Pick the first free DA
+    daid = cur.fetchone()['daid']
+
+    try:
+        cur.execute(f'''insert into food_order values (default, {rid}, {daid}, {cartid}, {custid}, NULL, 'PLACED', NOW()) returning oid;''')
+    except Exception:
+        response = Response(
+            response=json.dumps({"message": "KeyError. The Cartid and Custid is already present"}),
+            mimetype='application/json',
+            status=400
+        )
+        return response
+
+    oid = cur.fetchone()['oid']
+    cur.execute(f'''update cart set cartstatus = 'INACTIVE' where cartid = {cartid} and cartcustid = {custid};''')
+    con.commit() 
+
+    cur.close() 
+    con.close() 
+
+    response = Response(
+            response=json.dumps({"message": "Successfully placed order", "oid": oid}),
+            mimetype='application/json',
+            status=200
+    )
+    return response
+
+
+
+
+    
