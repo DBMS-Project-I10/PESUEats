@@ -193,7 +193,7 @@ def get_da():
     return response
 
 # TODO: needs auth
-@api_bp.route('/signup', methods=['POST'])
+@api_bp.route('/signup/customer', methods=['POST'])
 def signup():
     """
     user details in the form
@@ -202,7 +202,7 @@ def signup():
         "email": ,
         "password": , (hashed?)
         "phone": ,
-        "addr": ,
+        "addr": , -> optional
     }
 
     TODO: "loc": , (WKT?)
@@ -256,6 +256,7 @@ def signup():
             addr = 'null'
 
         # First create a wallet entry
+        # TODO: psql procedure/function
         query = f"""INSERT INTO WALLET VALUES (
             default, 0) RETURNING WID
         ;"""
