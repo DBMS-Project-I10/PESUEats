@@ -19,11 +19,14 @@ class AppConfig:
 
 appconfig = AppConfig()
 
+def get_cust_user():
+    return appconfig.config['POSTGRES']['cust_user']
+
 def get_pg_conn(*, dbname=None, user=None, host=None):
     if dbname is None:
         dbname = appconfig.config['POSTGRES']['dbname']
     if user is None:
-        user = appconfig.config['POSTGRES']['user']
+        user = appconfig.config['POSTGRES']['default_user']
     if host is None:
         host = appconfig.config['POSTGRES']['host']
 
