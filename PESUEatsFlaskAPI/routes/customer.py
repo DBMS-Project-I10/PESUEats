@@ -187,7 +187,13 @@ def signin():
     # .decode('UTF-8')
     if current_user['password'] == data['password']:
         # if check_password_hash(current_user.password, auth.password):  
-        token = jwt.encode({'public_id': current_user['public_id'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, os.environ['SECRET_KEY'])  
+        token = jwt.encode(
+            {
+                'public_id': current_user['public_id'], 
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+            }, 
+            os.environ['SECRET_KEY']
+        )  
         return jsonify({'token' : token}) 
 
     response = Response(
