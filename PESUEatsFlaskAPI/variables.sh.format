@@ -1,0 +1,7 @@
+
+# Copy all these variables to a file called variables.sh
+# Remember to add the secret key
+
+export FLASK_APP=app
+export FLASK_ENV=development
+export SECRET_KEY=<add_here>
