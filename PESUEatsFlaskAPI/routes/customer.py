@@ -176,6 +176,35 @@ def addtocart():
         )
     return response
 
+@cust_bp.route('/removefromcart', methods=["POST"])
+def removefromcart():
+    reqbody = request.json 
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    if 'custid' not in reqbody.keys() or 'itemid' not in reqbody.keys() or 'cartid' not in reqbody.keys():
+        response = Response(
+            response=json.dumps({"message": "CustId, ItemId or CartId not present"}),
+            mimetype='application/json',
+            status=400
+        )
+        return response
+
+    cur.execute(f'delete from menu_item_in_cart where miid = {reqbody["itemid"]} and micartid = {reqbody["cartid"]} and micartcustid = {reqbody["custid"]};')
+
+    #TODO IMP: Make a trigger and function to calculate tax amount and total amount of cart and update total amount
+    con.commit() 
+
+    cur.close()
+    con.close()
+    
+    response = Response(
+            response=json.dumps({"message": "Successfully removed to cart"}),
+            mimetype='application/json',
+            status=200
+        )
+    return response
+
 @cust_bp.route('/showcart')
 def showcart():
     con = get_pg_conn(user=get_cust_user())
