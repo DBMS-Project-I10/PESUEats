@@ -89,14 +89,14 @@ namespace PESUEatsWebAPI.Services
                 while (rdr.Read())
                 {
                     char[] uname = new char[15];
-                    char[] passwd = new char[30];
+                    char[] password = new char[30];
                     char[] roles = new char[50];
                     rdr.GetChars(0, 0, uname, 0, 15);
-                    rdr.GetChars(1, 0, passwd, 0, 30);
+                    rdr.GetChars(1, 0, password, 0, 30);
                     rdr.GetChars(2, 0, roles, 0, 50);
                     users.Add(new User(
                         Helper.charToString(uname),
-                        Helper.charToString(passwd),
+                        Helper.charToString(password),
                         Helper.charToString(roles).Split(",")
                         ));
                 }

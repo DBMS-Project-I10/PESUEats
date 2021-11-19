@@ -5,7 +5,7 @@
 CREATE TABLE app_users
 (
     username VARCHAR(15) PRIMARY KEY,
-    passwd VARCHAR(30) NOT NULL,
+    password VARCHAR(30) NOT NULL,
     roles VARCHAR(50)
 );
 
@@ -17,8 +17,8 @@ CREATE USER OrderManager WITH PASSWORD '1234' ;
 
 --roles: customer , restaurant , wallet , DA , OrderManager
 
-INSERT INTO app_users VALUES ( 'admin' , '1234' , 'admin' ) ;
-INSERT INTO app_users VALUES ( 'tarun' , '123' , 'customer' ) ;
-INSERT INTO app_users VALUES ( 'vibha' , '123' , 'restaurant' ) ;
-INSERT INTO app_users VALUES ( 'vishruth' , '123' , 'da' ) ;
+-- INSERT INTO app_users VALUES ( 'admin' , '1234' , 'admin' ) ;
+-- INSERT INTO app_users VALUES ( 'tarun' , '123' , 'customer' ) ;
+-- INSERT INTO app_users VALUES ( 'vibha' , '123' , 'restaurant' ) ;
+-- INSERT INTO app_users VALUES ( 'vishruth' , '123' , 'da' ) ;
 
