@@ -183,3 +183,58 @@ GRANT ALL ON DA TO da ;
 
 GRANT ALL ON FOOD_ORDER TO ordermanager ;
 GRANT ALL ON CART TO ordermanager ;
+
+
+CREATE OR REPLACE FUNCTION cart_add() 
+RETURNS trigger
+LANGUAGE plpgsql
+AS 
+$$
+    begin
+    update cart 
+    set CartTotalBillAmount = CartTotalBillAmount + (select Iprice from menu_item where iid = new.miid) * new.MIQuantity
+    where cartid = new.micartid and cartcustid = new.micartcustid;
+    return new;
+    end;
+$$;
+
+CREATE OR REPLACE FUNCTION cart_remove() 
+RETURNS trigger
+LANGUAGE plpgsql
+AS 
+$$
+    begin
+    update cart 
+    set CartTotalBillAmount = CartTotalBillAmount - (select Iprice from menu_item where iid = old.miid) * old.MIQuantity
+    where cartid = old.micartid and cartcustid = old.micartcustid;
+    return old;
+    end;
+$$;
+
+CREATE OR REPLACE FUNCTION taxupdate() 
+RETURNS trigger
+LANGUAGE plpgsql
+AS 
+$$
+    begin
+    update cart 
+    set CartTaxAmount = CartTotalBillAmount * 0.15;
+    return new;
+    end;
+$$;
+
+CREATE TRIGGER update_tax 
+after update of CartTotalBillAmount on CART 
+for each row 
+execute procedure taxupdate();
+
+
+CREATE TRIGGER updatecart_on_add 
+after insert on MENU_ITEM_IN_CART 
+for each row 
+execute procedure cart_add();
+
+CREATE TRIGGER updatecart_on_remove
+after delete on MENU_ITEM_IN_CART 
+for each row 
+execute procedure cart_remove();
