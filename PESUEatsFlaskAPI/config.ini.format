@@ -1,0 +1,9 @@
+[APP_CONFIG]
+init=false
+
+[POSTGRES]
+dbname=pesu_eats
+password=
+default_user=postgres
+cust_user=customer
+host=localhost
