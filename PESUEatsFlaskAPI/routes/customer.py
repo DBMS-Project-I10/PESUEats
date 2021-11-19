@@ -2,10 +2,22 @@
 Endpoints from a customer's pov
 """
 
-from psycopg2.extras import RealDictCursor
-from flask import Blueprint, request, json, Response
+import os
+import datetime
+import uuid
+import jwt
 
-from app.helper import get_pg_conn, appconfig, get_cust_user
+from psycopg2.extras import RealDictCursor, DictCursor
+from flask import (
+    Blueprint, 
+    request, 
+    json, 
+    Response, 
+    make_response, 
+    jsonify
+)
+
+from app.helper import get_pg_conn, appconfig, get_cust_user, token_required
 
 #  url_prefix='/api'
 
@@ -13,10 +25,11 @@ cust_bp = Blueprint('customer', __name__)
 
 
 
-# TODO: needs auth
 @cust_bp.route('/signup/customer', methods=['POST'])
 def signup():
     """
+    Sign up/register a new user
+
     user details in the form
     {
         "name": ,
@@ -25,10 +38,9 @@ def signup():
         "phone": ,
         "addr": , -> optional
     }
-
-    TODO: "loc": , (WKT?)
     """
     user_details = request.json
+    public_id = str(uuid.uuid4())
 
     # Check if necessary fields in post request
     if not ({'email', 'phone', 'name', 'password'} <= user_details.keys()):
@@ -57,8 +69,7 @@ def signup():
 
     # Check if email already registered (we will use 
     # only email and not phone number) for simplicity
-    # TODO: add roles to pg con?
-    con = get_pg_conn(user=get_cust_user())
+    con = get_pg_conn()
 
     cur = con.cursor(cursor_factory=RealDictCursor)
     email = user_details['email']
@@ -89,11 +100,13 @@ def signup():
             default, {wid}, null, {phone}, 
             '{addr}', '{user_details['name']}', '{user_details['email']}'
         );"""
+        print(public_id)
+        print('not yet failed')
         cur.execute(query)
         
-        # Insert into app users
-        # TODO: add custom roles?
+        # Insert into app_users
         query = f"""INSERT INTO APP_USERS VALUES (
+            '{public_id}',
             '{user_details['email']}',
             '{user_details['password']}',
             'customer'
@@ -128,7 +141,69 @@ def signup():
     con.close()
     return response
 
+
+@cust_bp.route('/signin/customer', methods=['POST'])
+def signin():
+    """
+    Sign in a customer
+
+    user details in the form
+    {
+        "username": ,
+        "password": , (hashed?)
+    }
+    """
+    data = request.json
+
+    if not data or not data['username'] or not data['password']:  
+     return make_response(
+        'could not verify', 
+        401, 
+        {
+            'WWW.Authentication': 'Basic realm: "login required"'
+        }
+    )
+
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    query = f"""SELECT * FROM app_users 
+    WHERE username='{data['username']}';
+    """
+
+    cur.execute(query)
+    current_user = cur.fetchone()
+
+    # If user does not exist
+    if current_user is None:
+        response = Response(
+            response=json.dumps({
+                "message": "User does not exist. Please sign up.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        return response
+    # .decode('UTF-8')
+    if current_user['password'] == data['password']:
+        # if check_password_hash(current_user.password, auth.password):  
+        token = jwt.encode({'public_id': current_user['public_id'], 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, os.environ['SECRET_KEY'])  
+        return jsonify({'token' : token}) 
+
+    response = Response(
+            response=json.dumps({
+                "message": "Could not sign in user.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+    return response
+    # return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
+
+
+
 @cust_bp.route('/addtocart', methods=["POST"])
+@token_required
 def addtocart():
     reqbody = request.json 
     con = get_pg_conn(user=get_cust_user())
@@ -177,6 +252,7 @@ def addtocart():
     return response
 
 @cust_bp.route('/removefromcart', methods=["POST"])
+@token_required
 def removefromcart():
     reqbody = request.json 
     con = get_pg_conn()
@@ -206,6 +282,7 @@ def removefromcart():
     return response
 
 @cust_bp.route('/showcart')
+@token_required
 def showcart():
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
@@ -239,6 +316,7 @@ def showcart():
     con.close()
 
 @cust_bp.route('/placeorder', methods=["POST"])
+@token_required
 def placeorder():
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
@@ -292,6 +370,7 @@ def placeorder():
 
 
 @cust_bp.route('/restaurants')
+@token_required
 def get_restaurants():
     """
     /restaurants
@@ -310,6 +389,7 @@ def get_restaurants():
     return response
 
 @cust_bp.route('/menuitems')
+@token_required
 def get_menuitems():
     """
     /menuitems

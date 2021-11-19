@@ -1,10 +1,12 @@
+import psycopg2
+from psycopg2.extras import RealDictCursor
+import os
+import configparser
+
 from flask import request, jsonify
 from functools import wraps
 import jwt
 
-
-import psycopg2
-import configparser
 
 class AppConfig:
     """
@@ -36,23 +38,38 @@ def get_pg_conn(*, dbname=None, user=None, host=None):
 def is_init():
     return appconfig.config['APP_CONFIG']['init']
 
-# def token_required(f):
-#     @wraps(f)
-#     def decorator(*args, **kwargs):
 
-#         token = None
+def token_required(f):
+    """
+    Use this decorator on route endpoints to ensure that token verification
+    is performed
+    """
+    @wraps(f)
+    def decorator(*args, **kwargs):
 
-#         if 'x-access-tokens' in request.headers:
-#             token = request.headers['x-access-tokens']
+        token = None
 
-#         if not token:
-#             return jsonify({'message': 'a valid token is missing'})
+        if 'token' in request.headers:
+            token = request.headers['token']
 
-#         try:
-#             data = jwt.decode(token, app.config[SECRET_KEY])
-#             current_user = Users.query.filter_by(public_id=data['public_id']).first()
-#         except:
-#             return jsonify({'message': 'token is invalid'})
+        if not token:
+            return jsonify({'message': 'a valid token is missing'})
 
-#             return f(current_user, *args, **kwargs)
-#     return decorator
+        try:
+            data = jwt.decode(token, os.environ['SECRET_KEY'], algorithms="HS256")
+            con = get_pg_conn()
+            cur = con.cursor(cursor_factory=RealDictCursor)
+
+            public_id = data['public_id']
+        
+            query = f"""SELECT * FROM app_users 
+            WHERE public_id='{public_id}';
+            """
+            cur.execute(query)
+            current_user = cur.fetchone()
+
+        except:
+            return jsonify({'message': 'token is invalid'})
+
+        return f(*args, **kwargs)
+    return decorator
