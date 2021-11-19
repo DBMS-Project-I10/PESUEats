@@ -6,16 +6,10 @@
    pip install -r requirements.txt
    ```
 
-2. Source the environment variables by running
+2. Configurate the app by editing `config.ini`
+
+3. Start the flask app server by running
 
    ```shell
-   source variables.sh
-   ```
-
-3. Configurate the app by editing `config.ini`
-
-4. Start the flask app server by running
-
-   ```shell
-   flask run
+   sh run.sh
    ```
