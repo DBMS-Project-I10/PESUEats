@@ -206,7 +206,7 @@ def signin():
 @token_required
 def addtocart():
     reqbody = request.json 
-    con = get_pg_conn(user=get_cust_user())
+    con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
 
     if 'custid' not in reqbody.keys() and 'itemid' not in reqbody.keys():
@@ -223,7 +223,7 @@ def addtocart():
         cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {reqbody['custid']};''')
         # TODO: Figure out how to add cartids
         # cur.execute(f'''insert into cart values (default, {reqbody.custid}, 'ACTIVE', 0, 0, 0) returning cartid''')
-        cur.execute(f'''insert into cart values (1, {reqbody['custid']}, 'ACTIVE', 0, 0, 0) returning cartid''')
+        cur.execute(f'''insert into cart values (default, {reqbody['custid']}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
         cartid = cur.fetchone()['cartid']
         con.commit() 
     else:
