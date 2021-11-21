@@ -3,7 +3,7 @@ from psycopg2.extras import RealDictCursor
 import os
 import configparser
 
-from flask import request, jsonify
+from flask import request, jsonify, Response, json
 from functools import wraps
 import jwt
 
@@ -24,15 +24,19 @@ appconfig = AppConfig()
 def get_cust_user():
     return appconfig.config['POSTGRES']['cust_user']
 
-def get_pg_conn(*, dbname=None, user=None, host=None):
+def get_pg_conn(*, dbname=None, user=None, host=None, password=None):
     if dbname is None:
         dbname = appconfig.config['POSTGRES']['dbname']
     if user is None:
         user = appconfig.config['POSTGRES']['default_user']
     if host is None:
         host = appconfig.config['POSTGRES']['host']
-
-    con = psycopg2.connect(dbname=dbname, user=user, host=host)
+    if password is None:
+        try:
+            password = appconfig.config['POSTGRES']['password']
+        except:
+            password=''
+    con = psycopg2.connect(dbname=dbname, user=user, host=host, password=password)
     return con
 
 def is_init():
@@ -53,7 +57,14 @@ def token_required(f):
             token = request.headers['token']
 
         if not token:
-            return jsonify({'message': 'a valid token is missing'})
+            response = Response(
+                response=json.dumps({
+                    "message": "A valid token is missing.",
+                }), 
+                content_type='application/json',
+                status=400
+            )
+            return response
 
         try:
             data = jwt.decode(token, os.environ['SECRET_KEY'], algorithms="HS256")
@@ -62,14 +73,31 @@ def token_required(f):
 
             public_id = data['public_id']
         
-            query = f"""SELECT * FROM app_users 
+            query = f"""SELECT username, roles FROM app_users 
             WHERE public_id='{public_id}';
             """
             cur.execute(query)
-            current_user = cur.fetchone()
+            current_user = dict(cur.fetchone())
+            
+            if current_user['roles'] == 'customer':
+                query = f"""SELECT custid FROM customer 
+                WHERE custemail='{current_user['username']}';
+                """
+                cur.execute(query)
+                current_user.update(dict(cur.fetchone()))
+
+            cur.close()
+            con.close()
 
         except:
-            return jsonify({'message': 'token is invalid'})
+            response = Response(
+                response=json.dumps({
+                    "message": "Token invalid.",
+                }), 
+                content_type='application/json',
+                status=400
+            )
+            return response
 
-        return f(*args, **kwargs)
+        return f(current_user, *args, **kwargs)
     return decorator

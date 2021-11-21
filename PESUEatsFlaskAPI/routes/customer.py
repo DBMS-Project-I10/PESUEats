@@ -77,7 +77,6 @@ def signup():
     query = f"""SELECT * FROM CUSTOMER 
         WHERE custemail = '{email}';
     """
-    print(query)
     cur.execute(query)
     
     if cur.fetchone() is None:
@@ -100,8 +99,6 @@ def signup():
             default, {wid}, null, {phone}, 
             '{addr}', '{user_details['name']}', '{user_details['email']}'
         );"""
-        print(public_id)
-        print('not yet failed')
         cur.execute(query)
         
         # Insert into app_users
@@ -156,13 +153,14 @@ def signin():
     data = request.json
 
     if not data or not data['username'] or not data['password']:  
-     return make_response(
-        'could not verify', 
-        401, 
-        {
-            'WWW.Authentication': 'Basic realm: "login required"'
-        }
-    )
+        response = Response(
+            response=json.dumps({
+                "message": 'Basic realm: "login required"',
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        return response
 
     con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
@@ -184,9 +182,9 @@ def signin():
             status=400
         )
         return response
-    # .decode('UTF-8')
+
     if current_user['password'] == data['password']:
-        # if check_password_hash(current_user.password, auth.password):  
+        # if check_password_hash(current_user.password, data['password']):  
         token = jwt.encode(
             {
                 'public_id': current_user['public_id'], 
@@ -210,14 +208,19 @@ def signin():
 
 @cust_bp.route('/addtocart', methods=["POST"])
 @token_required
-def addtocart():
-    reqbody = request.json 
+def addtocart(current_cust):
+    """
+    Add an item to the customer's cart
+    """
+    reqbody = request.json
     con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
 
-    if 'custid' not in reqbody.keys() and 'itemid' not in reqbody.keys():
+    custid = current_cust['custid']
+
+    if 'itemid' not in reqbody.keys():
         response = Response(
-            response=json.dumps({"message": "CustId and ItemId not present"}),
+            response=json.dumps({"message": "ItemId not present"}),
             mimetype='application/json',
             status=400
         )
@@ -225,7 +228,7 @@ def addtocart():
 
     # Creating new cart if not present
     if 'cartid' not in reqbody.keys():
-        cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {reqbody['custid']};''')
+        cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
         # TODO: Figure out how to add cartids
         cur.execute(f'''insert into cart values (default, {reqbody['custid']}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
         cartid = cur.fetchone()['cartid']
@@ -240,8 +243,10 @@ def addtocart():
 
     #TODO : Figure out how to validate all items being added to cart are from the same restaurant (Might use Triggers and Functions)
 
-    cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {reqbody["custid"]}, {quantity});')
+    cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {custid}, {quantity});')
     # When menu item is added into cart, triggers and fucntions defined in create.sql automatically update cart value and tax amounts 
+
+    
     con.commit() 
 
     cur.close()
@@ -256,14 +261,16 @@ def addtocart():
 
 @cust_bp.route('/removefromcart', methods=["POST"])
 @token_required
-def removefromcart():
+def removefromcart(current_cust):
     reqbody = request.json 
     con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
 
-    if 'custid' not in reqbody.keys() or 'itemid' not in reqbody.keys() or 'cartid' not in reqbody.keys():
+    custid = current_cust['custid']
+
+    if 'itemid' not in reqbody.keys() or 'cartid' not in reqbody.keys():
         response = Response(
-            response=json.dumps({"message": "CustId, ItemId or CartId not present"}),
+            response=json.dumps({"message": "ItemId or CartId not present"}),
             mimetype='application/json',
             status=400
         )
@@ -285,7 +292,7 @@ def removefromcart():
 
 @cust_bp.route('/showcart')
 @token_required
-def showcart():
+def showcart(current_cust):
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
 
@@ -319,7 +326,7 @@ def showcart():
 
 @cust_bp.route('/placeorder', methods=["POST"])
 @token_required
-def placeorder():
+def placeorder(current_cust):
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
 
@@ -373,7 +380,7 @@ def placeorder():
 
 @cust_bp.route('/restaurants')
 @token_required
-def get_restaurants():
+def get_restaurants(current_cust):
     """
     /restaurants
     """
@@ -392,7 +399,7 @@ def get_restaurants():
 
 @cust_bp.route('/menuitems')
 @token_required
-def get_menuitems():
+def get_menuitems(current_cust):
     """
     /menuitems
     /menuitems?rid={}

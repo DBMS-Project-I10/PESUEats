@@ -19,3 +19,132 @@
    ```shell
    sh run.sh
    ```
+
+## Endpoints
+
+### Customer endpoints
+
+1. Sign up a new customer
+
+   - Endpoint: `/signup/customer`
+   - Token: `not required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "name": "name:optional:string",               
+         "email": "email@email.com:required:string",
+         "password": "password:required:string",     
+         "phone": "1111111111:required:string",
+         "addr": "address:optional:string"
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "custaddr": "address",
+         "custemail": "email@email.com",
+         "custname": "name",
+         "custphone": "1111111111"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+2. Sign in an existing customer
+
+   - Endpoint: `/signin/customer`
+   - Token: `not required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "username": "email@email.com:required:string",
+         "password": "password:required:string"
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "token": "token"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+3. Add an item to cart
+
+   - Endpoint: `/addtocart`
+   - Token: `required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "itemid": "itemid:required:int"
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "cartid": 1,
+         "message": "Successfully added to cart"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+4. Remove an item from cart
+
+   - Endpoint: `/removefromcart`
+   - Token: `required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
