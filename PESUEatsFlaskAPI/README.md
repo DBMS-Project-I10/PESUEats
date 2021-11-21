@@ -148,3 +148,129 @@
          "message": "error message"
       }
       ```
+
+5. Show all items in a cart
+
+   - Endpoint: `/showcart`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      {
+         
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+6. Place order
+
+   - Endpoint: `/placeorder`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      {
+         
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+7. Get a list of all the restaurants
+
+   - Endpoint: `/restaurants`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "rcuisine": "Burgers",
+            "rhaswid": 1,
+            "rid": 1,
+            "rlocation": "12.9716 N, 77.5946 E",
+            "rname": "McDonalds",
+            "rrating": 4.0
+         },
+      ]
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+8. Get all the menu items of all restaurants
+
+   - Endpoint: `/menuitems`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "icategory": "Classic Burgers",
+            "idescription": "desc",
+            "iid": 1,
+            "iinmenurid": 1,
+            "iname": "McVeggie Burger",
+            "iprice": 100.0
+         },
+      ]
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+9. Get all the menu items of a single restaurant
+
+   - Endpoint: `/menuitems?rid={rid}`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "icategory": "Classic Burgers",
+            "idescription": "desc",
+            "iid": 1,
+            "iinmenurid": 1,
+            "iname": "McVeggie Burger",
+            "iprice": 100.0
+         },
+      ]
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
