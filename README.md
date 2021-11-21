@@ -14,13 +14,14 @@
 3. Terminal 2: (This starts the Web app that uses the API)
   
    ```shell
-   cd PESUEatsBlazorServer  
+   cd PESUEats.WebFrontend/PESUEatsBlazorServer  
    sh run.sh
    ```
 
 > You can use `dotnet watch` command if you are developing and want live changes
 
-### Other method to run
+## Cloning
 
-You CAN use `tye` to run the app by using the command `tye run` in the terminal set to the project root folder.  
-Make sure you have `tye` installed from [here](https://www.nuget.org/packages/Microsoft.Tye/0.10.0-alpha.21420.1)
+Note that while cloning, you'll need to ensure that the `PESUEats.WebFrontend` submodule is also cloned, using the command `git clone https://github.com/DBMS-Project-I10/PESUEats --recurse-submodules`.
+
+In case you cloned it without the `--recurse-submodules` argument, simple execute `git submodule init` followed by `git submodule update`.
