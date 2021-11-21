@@ -77,7 +77,6 @@ def signup():
     query = f"""SELECT * FROM CUSTOMER 
         WHERE custemail = '{email}';
     """
-    print(query)
     cur.execute(query)
     
     if cur.fetchone() is None:
@@ -100,8 +99,6 @@ def signup():
             default, {wid}, null, {phone}, 
             '{addr}', '{user_details['name']}', '{user_details['email']}'
         );"""
-        print(public_id)
-        print('not yet failed')
         cur.execute(query)
         
         # Insert into app_users
@@ -156,13 +153,14 @@ def signin():
     data = request.json
 
     if not data or not data['username'] or not data['password']:  
-     return make_response(
-        'could not verify', 
-        401, 
-        {
-            'WWW.Authentication': 'Basic realm: "login required"'
-        }
-    )
+        response = Response(
+            response=json.dumps({
+                "message": 'Basic realm: "login required"',
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        return response
 
     con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
@@ -211,6 +209,9 @@ def signin():
 @cust_bp.route('/addtocart', methods=["POST"])
 @token_required
 def addtocart(current_cust):
+    """
+    Add an item to the customer's cart
+    """
     reqbody = request.json
     con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
