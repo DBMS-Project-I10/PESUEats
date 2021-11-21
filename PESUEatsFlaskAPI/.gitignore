@@ -19,4 +19,5 @@ build/
 
 # Variables
 variables.sh
+variables.ps1
 config.ini
