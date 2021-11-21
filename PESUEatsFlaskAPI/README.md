@@ -119,3 +119,32 @@
          "message": "error message"
       }
       ```
+
+4. Remove an item from cart
+
+   - Endpoint: `/removefromcart`
+   - Token: `required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
