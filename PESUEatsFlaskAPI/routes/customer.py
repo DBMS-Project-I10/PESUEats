@@ -226,13 +226,11 @@ def addtocart(current_cust):
         )
         return response
 
-    # cartid = None
     # Creating new cart if not present
     if 'cartid' not in reqbody.keys():
         cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
         # TODO: Figure out how to add cartids
-        # cur.execute(f'''insert into cart values (default, {reqbody.custid}, 'ACTIVE', 0, 0, 0) returning cartid''')
-        cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
+        cur.execute(f'''insert into cart values (default, {reqbody['custid']}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
         cartid = cur.fetchone()['cartid']
         con.commit() 
     else:
@@ -246,8 +244,9 @@ def addtocart(current_cust):
     #TODO : Figure out how to validate all items being added to cart are from the same restaurant (Might use Triggers and Functions)
 
     cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {custid}, {quantity});')
+    # When menu item is added into cart, triggers and fucntions defined in create.sql automatically update cart value and tax amounts 
 
-    #TODO IMP: Make a trigger and function to calculate tax amount and total amount of cart and update total amount
+    
     con.commit() 
 
     cur.close()
@@ -277,9 +276,8 @@ def removefromcart(current_cust):
         )
         return response
 
-    cur.execute(f'delete from menu_item_in_cart where miid = {reqbody["itemid"]} and micartid = {reqbody["cartid"]} and micartcustid = {custid};')
-
-    #TODO IMP: Make a trigger and function to calculate tax amount and total amount of cart and update total amount
+    cur.execute(f'delete from menu_item_in_cart where miid = {reqbody["itemid"]} and micartid = {reqbody["cartid"]} and micartcustid = {reqbody["custid"]};')
+    # When menu item is added into cart, triggers and fucntions defined in create.sql automatically update cart value and tax amounts 
     con.commit() 
 
     cur.close()
