@@ -298,7 +298,7 @@ def showcart(current_cust):
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
 
-    custid = request.args.get('custid')
+    custid = current_cust['custid']
     cartid = request.args.get('cartid')
 
     if cartid is None and custid is None:
@@ -326,7 +326,7 @@ def showcart(current_cust):
     cur.close()
     con.close()
 
-@cust_bp.route('/placeorder', methods=["POST"])
+@cust_bp.route('/placeorder', methods=["GET"])
 @token_required
 def placeorder(current_cust):
     con = get_pg_conn(user=get_cust_user())
