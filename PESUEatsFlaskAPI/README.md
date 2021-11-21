@@ -33,11 +33,11 @@
 
       ```json
       {
-         "name": "name",               // optional
-         "email": "email@email.com",   // required
-         "password": "password",       // required
-         "phone": "1111111111",        // required
-         "addr": "address"             // optional
+         "name": "name",               optional
+         "email": "email@email.com",   required
+         "password": "password",       required
+         "phone": "1111111111",        required
+         "addr": "address"             optional
       }
       ```
 
@@ -69,8 +69,8 @@
 
       ```json
       {
-         "username": "email@email.com",   // optional
-         "password": "password"           // required
+         "username": "email@email.com",   optional
+         "password": "password"           required
       }
       ```
 
@@ -99,7 +99,7 @@
 
       ```json
       {
-         "itemid": 1    // required - id from menu items table
+         "itemid": 1    required - id from menu items table
       }
       ```
 
