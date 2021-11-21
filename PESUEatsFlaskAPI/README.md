@@ -70,7 +70,7 @@
       ```json
       {
          "username": "email@email.com",   // optional
-         "password": "password"          // required
+         "password": "password"           // required
       }
       ```
 
