@@ -54,11 +54,11 @@
 
    - On error: `Status 400`
 
-   ```json
-   {
-      "message": "error message"
-   }
-   ```
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
 
 2. Sign in an existing customer
 
@@ -84,11 +84,11 @@
 
    - On error: `Status 400`
 
-   ```json
-   {
-      "message": "error message"
-   }
-   ```
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
 
 3. Add an item to cart
 
@@ -114,8 +114,8 @@
 
    - On error: `Status 400`
 
-   ```json
-   {
-      "message": "error message"
-   }
-   ```
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
