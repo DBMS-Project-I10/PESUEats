@@ -99,8 +99,7 @@
 
       ```json
       {
-         "username": "email@email.com",   // optional
-         "password": "password"          // required
+         "itemid": 1    // required - id from menu items table
       }
       ```
 
@@ -108,7 +107,8 @@
 
       ```json
       {
-         "token": "token"
+         "cartid": 1,
+         "message": "Successfully added to cart"
       }
       ```
 
