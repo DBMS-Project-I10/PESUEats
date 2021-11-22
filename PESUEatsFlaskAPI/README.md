@@ -20,6 +20,17 @@
    sh run.sh
    ```
 
+5. If you want to setup your initial PostgresqlDB configuration, set `init` to `true` in `config.ini`, like this:
+
+   ```shell
+   [APP_CONFIG]
+   init=false
+   ```
+
+   After that, just run `run.sh` (mac) or `run.ps1` (windows) to setup the DB at startup.
+
+> DO NOT forget to set it to `false` after your DB ahs been setup!
+
 ## Endpoints
 
 ### Customer endpoints
