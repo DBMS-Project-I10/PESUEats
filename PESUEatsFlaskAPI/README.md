@@ -25,6 +25,39 @@
 
 > DO NOT forget to set it to `false` after your DB ahs been setup!
 
+## TODO
+
+"Unimportant todos":
+
+1. logout to invalidate token
+2. Document admin
+
+> Refer Python files for more todos
+
+## Major functionality Summary
+
+(based on minutes of meeting)
+
+Common Views:  
+- My profile: View, Update  
+- Wallet: View transactions, add  
+- order history: see prev orders, cart order  
+
+Specific Views:  
+1. Customer  
+   restaurant: addtocart, change quantity, empty cart, remove  
+   My order: view order, showcart  
+2. Restaurant  
+   menu: add, delete, update  
+   current order: view cart, view order details, two buttons: start prep, handover order | ,   
+3. da  
+   current delivery: view order, button: delivered
+4. Admin  
+   all tables to view
+
+
+
+
 ## Endpoints
 
 ### General endpoints
