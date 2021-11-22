@@ -5,7 +5,6 @@ Endpoints for delivery agent's pov
 import os
 import datetime
 import uuid
-from PESUEatsFlaskAPI.app.helper import token_required
 import jwt
 
 from psycopg2.extras import RealDictCursor
@@ -17,7 +16,7 @@ from flask import (
     jsonify
 )
 
-from app.helper import get_pg_conn, validate_dict
+from app.helper import get_pg_conn, validate_dict, token_required
 
 da_bp = Blueprint('da', __name__)
 

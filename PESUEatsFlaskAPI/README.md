@@ -418,7 +418,7 @@
          "message": "error message"
       }
       ```
- 
+
 2. Change status to `PREPARING`
    - Endpoint: `/changestatus/preparing`
    - Token: `required`
