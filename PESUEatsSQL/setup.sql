@@ -10,7 +10,7 @@ CREATE DATABASE pesu_eats;
 CREATE TABLE app_users
 (
     public_id VARCHAR(50) UNIQUE,
-    username VARCHAR(15) PRIMARY KEY,
+    username INT NOT NULL,
     password VARCHAR(30) NOT NULL,
     roles VARCHAR(50)
 );
