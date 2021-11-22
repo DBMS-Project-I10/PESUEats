@@ -78,8 +78,8 @@ def signup():
 
         email = user_details['email']
         # Check if user already exists
-        query = f"""SELECT * FROM CUSTOMER 
-            WHERE custemail = '{email}';
+        query = f"""SELECT username FROM app_users 
+            WHERE username = '{email}' and roles = 'customer';
         """
         cur.execute(query)
         
@@ -107,7 +107,7 @@ def signup():
             # Insert into app_users
             query = f"""INSERT INTO APP_USERS VALUES (
                 '{public_id}',
-                '{custid}',
+                '{email}',
                 '{user_details['password']}',
                 'customer'
             );"""
@@ -137,7 +137,7 @@ def signup():
                 status=400
             )
 
-    except:
+    except Exception as e:
         response = Response(
             response=json.dumps({
                 "message": "Error in request body.",
@@ -145,6 +145,7 @@ def signup():
             content_type='application/json',
             status=400
         )
+        print(e)
 
     if cur is not None:
         cur.close()
@@ -152,103 +153,6 @@ def signup():
         con.close()
     return response
 
-
-@cust_bp.route('/signin/customer', methods=['POST'])
-def signin():
-    """
-    Sign in a customer
-
-    user details in the form
-    {
-        "username": ,
-        "password": , (hashed?)
-    }
-    """
-    data = request.json
-
-    if not data or not data['username'] or not data['password']:  
-        response = Response(
-            response=json.dumps({
-                "message": 'Basic realm: "login required"',
-            }), 
-            content_type='application/json',
-            status=400
-        )
-        return response
-
-    con = get_pg_conn()
-    cur = con.cursor(cursor_factory=RealDictCursor)
-
-    query = f"""SELECT custid FROM customer 
-    WHERE custemail='{data['username']}';
-    """
-    cur.execute(query)
-
-    cust = cur.fetchone()
-
-    # If user does not exist
-    if cust is None:
-        response = Response(
-            response=json.dumps({
-                "message": "User does not exist. Please sign up.",
-            }), 
-            content_type='application/json',
-            status=400
-        )
-        return response
-
-    else:
-        custid = cust['custid']
-
-    query = f"""SELECT * FROM app_users 
-    WHERE username={custid};
-    """
-    
-    cur.execute(query)
-    current_user = cur.fetchone()
-
-    
-    if current_user['password'] == data['password']:
-        # if check_password_hash(current_user.password, data['password']):  
-        token = jwt.encode(
-            {
-                'public_id': current_user['public_id'], 
-                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-            }, 
-            os.environ['SECRET_KEY']
-        )  
-        return jsonify({'token' : token}) 
-
-
-    response = Response(
-            response=json.dumps({
-                "message": "Incorrect username or password.",
-            }), 
-            content_type='application/json',
-            status=400
-        )
-    return response
-    # return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
-
-@cust_bp.route('/getcartid', methods=["GET"])
-@token_required
-def getcartid(current_cust):
-    custid = request.args.get('custid')
-    con = get_pg_conn()
-    cur = con.cursor(cursor_factory=RealDictCursor)
-
-    cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
-    # TODO: Figure out how to add cartids
-    cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
-    cartid = cur.fetchone()['cartid']
-    con.commit()
-
-    response = Response(
-            response=json.dumps({"message": "Successfully created cart", "cartid": cartid}),
-            mimetype='application/json',
-            status=200
-        )
-    return response
 
 @cust_bp.route('/addtocart', methods=["POST"])
 @token_required

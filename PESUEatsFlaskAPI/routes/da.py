@@ -28,7 +28,7 @@ def signup():
     user details in the form
     {
         "name": ,
-        "phone": ,
+        "email": ,
         "password": (hashed?)
     }
     """
@@ -39,42 +39,29 @@ def signup():
 
     try:
         # Check if necessary fields in post request
-        if not user_details or not ({'phone', 'name', 'password'} <= user_details.keys()):
+        if not user_details or not ({'email', 'name', 'password'} <= user_details.keys()):
             response = Response(
                 response=json.dumps({
-                    "message": "Missing a required parameter (phone, name or password)",
+                    "message": "Missing a required parameter (email, name or password)",
                 }), 
                 content_type='application/json',
                 status=400
             )
             return response
+        
+        email = user_details['email']
 
-        # Make sure phone number can be converted to int
-        phone = None
-        try:
-            phone = int(user_details['phone'])
-        except Exception as e:
-            response = Response(
-                response=json.dumps({
-                    "message": "Phone number not a valid phone number",
-                }), 
-                content_type='application/json',
-                status=400
-            )
-            return response
-
-        # Check if phone already registered 
+        # Check if email already registered 
         con = get_pg_conn()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         # Check if user already exists
-        query = f"""SELECT daphone FROM da 
-            WHERE daphone = '{phone}';
+        query = f"""SELECT username FROM app_users 
+            WHERE username = '{email}' and roles = 'da';
         """
         cur.execute(query)
         
         if cur.fetchone() is None:
-
             # First create a wallet entry
             query = f"""INSERT INTO WALLET VALUES (
                 default, 0) RETURNING WID
@@ -86,7 +73,7 @@ def signup():
             # Location is null when created: will
             # only update with diff API
             query = f"""INSERT INTO DA VALUES (
-                default, '{phone}', {wid}, '{user_details['name']}', null
+                default, '{email}', {wid}, '{user_details['name']}', null
             ) RETURNING daid;"""
             cur.execute(query)
             daid = cur.fetchone()['daid']
@@ -94,7 +81,7 @@ def signup():
             # Insert into app_users
             query = f"""INSERT INTO APP_USERS VALUES (
                 '{public_id}',
-                '{daid}',
+                '{email}',
                 '{user_details['password']}',
                 'da'
             );"""
@@ -104,8 +91,8 @@ def signup():
             con.commit()
 
             # Return the customer record inserted
-            query = f"""SELECT daphone, daname FROM da 
-                WHERE daphone = '{phone}';
+            query = f"""SELECT daemail, daname FROM da 
+                WHERE daemail = '{email}';
             """
             cur.execute(query)        
             item = cur.fetchone()
@@ -118,7 +105,7 @@ def signup():
         else:
             response = Response(
             response=json.dumps({
-                "message": "Delivery agent already exists. Please sign in.",
+                "message": "User already exists. Please sign in.",
             }), 
             content_type='application/json',
             status=400
