@@ -224,7 +224,7 @@ def removefromcart(current_cust):
         )
         return response
 
-    cur.execute(f'delete from menu_item_in_cart where miid = {reqbody["itemid"]} and micartid = {reqbody["cartid"]} and micartcustid = {reqbody["custid"]};')
+    cur.execute(f'delete from menu_item_in_cart where miid = {reqbody["itemid"]} and micartid = {reqbody["cartid"]} and micartcustid = {custid};')
     # When menu item is added into cart, triggers and fucntions defined in create.sql automatically update cart value and tax amounts 
     con.commit() 
 
