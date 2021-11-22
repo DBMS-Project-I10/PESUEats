@@ -7,17 +7,16 @@ import datetime
 import uuid
 import jwt
 
-from psycopg2.extras import RealDictCursor, DictCursor
+from psycopg2.extras import RealDictCursor
 from flask import (
     Blueprint, 
     request, 
     json, 
     Response, 
-    make_response, 
     jsonify
 )
 
-from app.helper import get_pg_conn, appconfig, get_cust_user, token_required
+from app.helper import get_pg_conn, get_cust_user, token_required
 
 #  url_prefix='/api'
 
@@ -28,7 +27,7 @@ cust_bp = Blueprint('customer', __name__)
 @cust_bp.route('/signup/customer', methods=['POST'])
 def signup():
     """
-    Sign up/register a new user
+    Sign up/register a new customer
 
     user details in the form
     {
@@ -80,14 +79,12 @@ def signup():
     cur.execute(query)
     
     if cur.fetchone() is None:
-        # TODO: update loc, wallet
         if 'addr' in user_details.keys():
             addr = user_details['addr']
         else:
             addr = 'null'
 
         # First create a wallet entry
-        # TODO: psql procedure/function
         query = f"""INSERT INTO WALLET VALUES (
             default, 0) RETURNING WID
         ;"""
@@ -98,13 +95,14 @@ def signup():
         query = f"""INSERT INTO CUSTOMER VALUES (
             default, {wid}, null, {phone}, 
             '{addr}', '{user_details['name']}', '{user_details['email']}'
-        );"""
+        ) RETURNING custid;"""
         cur.execute(query)
+        custid = cur.fetchone()['custid']
         
         # Insert into app_users
         query = f"""INSERT INTO APP_USERS VALUES (
             '{public_id}',
-            '{user_details['email']}',
+            '{custid}',
             '{user_details['password']}',
             'customer'
         );"""
@@ -165,15 +163,15 @@ def signin():
     con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
 
-    query = f"""SELECT * FROM app_users 
-    WHERE username='{data['username']}';
+    query = f"""SELECT custid FROM customer 
+    WHERE custemail='{data['username']}';
     """
-
     cur.execute(query)
-    current_user = cur.fetchone()
+
+    cust = cur.fetchone()
 
     # If user does not exist
-    if current_user is None:
+    if cust is None:
         response = Response(
             response=json.dumps({
                 "message": "User does not exist. Please sign up.",
@@ -183,6 +181,17 @@ def signin():
         )
         return response
 
+    else:
+        custid = cust['custid']
+
+    query = f"""SELECT * FROM app_users 
+    WHERE username={custid};
+    """
+    
+    cur.execute(query)
+    current_user = cur.fetchone()
+
+    
     if current_user['password'] == data['password']:
         # if check_password_hash(current_user.password, data['password']):  
         token = jwt.encode(
@@ -194,9 +203,10 @@ def signin():
         )  
         return jsonify({'token' : token}) 
 
+
     response = Response(
             response=json.dumps({
-                "message": "Could not sign in user.",
+                "message": "Incorrect username or password.",
             }), 
             content_type='application/json',
             status=400
@@ -230,7 +240,7 @@ def addtocart(current_cust):
     if 'cartid' not in reqbody.keys():
         cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
         # TODO: Figure out how to add cartids
-        cur.execute(f'''insert into cart values (default, {reqbody['custid']}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
+        cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
         cartid = cur.fetchone()['cartid']
         con.commit() 
     else:

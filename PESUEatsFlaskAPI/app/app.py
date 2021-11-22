@@ -6,7 +6,7 @@ from app.helper import get_pg_conn
 
 from routes import cust_bp
 
-from routes.routes import api_bp
+from routes.services import api_bp
 
 
 DEC2FLOAT = psycopg2.extensions.new_type(
