@@ -132,3 +132,67 @@ def signup():
     if con is not None:
         con.close()
     return response
+
+@rest_bp.route('/changestatus/preparing', methods=["POST"])
+@token_required
+def changestatustopreparing(cur_user):
+    con = get_pg_conn(user = "restaurant", password = "1234")
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    # reqbody = request.json 
+
+    # daid = reqbody['daid']
+
+    if cur_user['role'] != 'restaurant':
+        response = Response(
+            response=json.dumps({"message": "Unathorized access"}),
+            mimetype='application/json',
+            status = 400
+        )
+        return response
+    
+    rid = cur_user['rid']
+    
+    cur.execute(f'''update food_order set ostatus = "PREPARING" where ofromrid = {rid} and ostatus = "PLACED";''')
+    con.commit()
+
+    cur.close() 
+    con.close() 
+
+    response = Response(
+        response=json.dumps({"message": "Successfully updated status"}),
+        mimetype='application/json',
+        status = 200
+    )
+    return response
+
+@rest_bp.route('/changestatus/pickedup', methods=["POST"])
+@token_required
+def changestatustopickedup(cur_user):
+    con = get_pg_conn(user = "restaurant", password = "1234")
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    # reqbody = request.json 
+
+    # daid = reqbody['daid']
+
+    if cur_user['role'] != 'restaurant':
+        response = Response(
+            response=json.dumps({"message": "Unathorized access"}),
+            mimetype='application/json',
+            status = 400
+        )
+        return response
+    
+    rid = cur_user['rid']
+    
+    cur.execute(f'''update food_order set ostatus = "PICKED UP" where ofromrid = {rid} and ostatus = "PREPARING";''')
+    con.commit()
+
+    cur.close() 
+    con.close() 
+
+    response = Response(
+        response=json.dumps({"message": "Successfully updated status"}),
+        mimetype='application/json',
+        status = 200
+    )
+    return response

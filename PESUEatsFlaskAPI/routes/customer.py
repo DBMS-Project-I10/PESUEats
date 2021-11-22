@@ -150,6 +150,45 @@ def signup():
         con.close()
     return response
 
+#TODO : empty cart endpoint
+@cust_bp.route('/createnewcart', methods=["POST"])
+@token_required
+def newcart(current_cust):
+    # custid = request.args.get('custid')
+    custid = current_cust['custid']
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
+    # TODO: Figure out how to add cartids
+    cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
+    cartid = cur.fetchone()['cartid']
+    con.commit()
+
+    response = Response(
+            response=json.dumps({"message": "Successfully created cart", "cartid": cartid}),
+            mimetype='application/json',
+            status=200
+        )
+    return response
+
+@cust_bp.route('/getcartid', methods = ["GET"])
+@token_required 
+def getcartid(current_cust):
+    custid = current_cust['custid']
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    
+    cur.execute(f'''select cartid from cart where cartcustid = {custid} and cartstatus = "ACTIVE";''')
+    cartid = cur.fetchone()['cartid']
+
+    response = Response(
+        response=json.dumps({"cartid": cartid}),
+        mimetype='application/json',
+        status=200
+    )
+    return response
+
 
 @cust_bp.route('/addtocart', methods=["POST"])
 @token_required
@@ -162,6 +201,7 @@ def addtocart(current_cust):
     cur = con.cursor(cursor_factory=RealDictCursor)
 
     custid = current_cust['custid']
+    cartid = current_cust['cartid']
 
     if 'itemid' not in reqbody.keys():
         response = Response(
@@ -173,15 +213,22 @@ def addtocart(current_cust):
 
     try:
 
-        # Creating new cart if not present
-        if 'cartid' not in reqbody.keys():
-            cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
-            cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
-            cartid = cur.fetchone()['cartid']
-            con.commit() 
-        else:
-            cartid = reqbody["cartid"] 
+        # cur.execute(f'''select cartid from cart where cartcustid = {custid} and cartstatus = "ACTIVE";''')
+        # cartid = cur.fetchone()['cartid']
+
+
         
+        # Creating new cart if not present
+        # if 'cartid' not in reqbody.keys():
+        #     cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
+        #     cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
+        #     cartid = cur.fetchone()['cartid']
+        #     con.commit() 
+        # else:
+        #     cartid = reqbody["cartid"] 
+        
+        #TODO: Quantity updation 
+
         if 'quantity' in reqbody.keys():
             quantity = reqbody['quantity']
         else:
@@ -397,39 +444,4 @@ def get_menuitems(current_cust):
     return response
     return json.dumps(items, indent=2)
 
-# @cust_bp.route('/orders/customer/current', methods=["GET"])
-# def getcurrentorders():
-#     con = get_pg_conn(user=get_cust_user())
-#     cur = con.cursor(cursor_factory=RealDictCursor)
-
-#     custid = request.args.get('custid')
-
-#     cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus != "DELIVERED";''')
-#     items = cur.fetchall() 
-#     cur.close() 
-#     con.close() 
-
-#     response = Response(
-#         response=json.dumps(items, indent=2),
-#         mimetype='application/json'
-#     )
-#     return response
-
-# @cust_bp.route('/orders/customer/history', methods=["GET"])
-# def getprevorders():
-#     con = get_pg_conn(user=get_cust_user())
-#     cur = con.cursor(cursor_factory=RealDictCursor)
-
-#     custid = request.args.get('custid')
-
-#     cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus = "DELIVERED";''')
-#     items = cur.fetchall() 
-#     cur.close() 
-#     con.close() 
-
-#     response = Response(
-#         response=json.dumps(items, indent=2),
-#         mimetype='application/json'
-#     )
-#     return response
     

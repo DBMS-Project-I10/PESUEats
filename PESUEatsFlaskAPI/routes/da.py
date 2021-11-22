@@ -5,6 +5,7 @@ Endpoints for delivery agent's pov
 import os
 import datetime
 import uuid
+from PESUEatsFlaskAPI.app.helper import token_required
 import jwt
 
 from psycopg2.extras import RealDictCursor
@@ -130,12 +131,23 @@ def signup():
 
 
 @da_bp.route('/changestatus/delivered', methods=["POST"])
-def changestatus():
-    con = get_pg_conn()
+@token_required
+def changestatus(cur_user):
+    con = get_pg_conn(user = "da", password = "1234")
     cur = con.cursor(cursor_factory=RealDictCursor)
-    reqbody = request.json 
+    # reqbody = request.json 
 
-    daid = reqbody['daid']
+    # daid = reqbody['daid']
+
+    if cur_user['role'] != 'da':
+        response = Response(
+            response=json.dumps({"message": "Unathorized access"}),
+            mimetype='application/json',
+            status = 400
+        )
+        return response
+    
+    daid = cur_user['daid']
 
     cur.execute(f'''update food_order set ostatus = "DELIVERED" where odaid = {daid} and ostatus = "PICKED UP";''')
     con.commit()
