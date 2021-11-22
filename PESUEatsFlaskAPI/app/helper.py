@@ -80,11 +80,14 @@ def token_required(f):
             current_user = dict(cur.fetchone())
             
             if current_user['roles'] == 'customer':
-                query = f"""SELECT custid FROM customer 
-                WHERE custemail='{current_user['username']}';
-                """
-                cur.execute(query)
-                current_user.update(dict(cur.fetchone()))
+                current_user['custid'] = current_user['username']
+                current_user.pop('username')
+            elif current_user['roles'] == 'restaurant':
+                current_user['rid'] = current_user['username']
+                current_user.pop('username')
+            elif current_user['roles'] == 'da':
+                current_user['daid'] = current_user['username']
+                current_user.pop('username')
 
             cur.close()
             con.close()
