@@ -1,0 +1,4 @@
+[submodule "PESUEats.WebFrontend"]
+	path = PESUEats.WebFrontend
+	url = https://github.com/DBMS-Project-I10/PESUEats.WebFrontend.git
+	branch = main
