@@ -80,14 +80,32 @@ def token_required(f):
             current_user = dict(cur.fetchone())
             
             if current_user['roles'] == 'customer':
-                current_user['custid'] = current_user['username']
-                current_user.pop('username')
+                query = f"""SELECT custid FROM customer 
+                WHERE custemail='{current_user['username']}';
+                """
+                cur.execute(query)
+                custid = dict(cur.fetchone())['custid']
+
+                current_user['custid'] = custid
+                
             elif current_user['roles'] == 'restaurant':
-                current_user['rid'] = current_user['username']
-                current_user.pop('username')
+                query = f"""SELECT rid FROM restaurant 
+                WHERE remail='{current_user['username']}';
+                """
+                cur.execute(query)
+                custid = dict(cur.fetchone())['rid']
+
+                current_user['rid'] = custid
+                
             elif current_user['roles'] == 'da':
-                current_user['daid'] = current_user['username']
-                current_user.pop('username')
+                query = f"""SELECT daid FROM da 
+                WHERE daemail='{current_user['username']}';
+                """
+                cur.execute(query)
+                custid = dict(cur.fetchone())['daid']
+
+                current_user['daid'] = custid
+                
 
             cur.close()
             con.close()

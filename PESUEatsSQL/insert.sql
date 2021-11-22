@@ -37,15 +37,15 @@ INSERT INTO WALLET VALUES (DEFAULT, 500.0);
 INSERT INTO WALLET VALUES (DEFAULT, 500.0);
 
 -- Restaurant records
-INSERT INTO RESTAURANT VALUES (DEFAULT, 1, 'McDonalds', '12.9716 N, 77.5946 E', 4.0, 'Burgers');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 2, 'The Taste of Punjab', '12.9716 N, 77.5946 E', 4.8, 'North Indian');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 3, 'Udupi Aahar', '12.9716 N, 77.5946 E', 3.2, 'South Indian');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 4, 'Dominos Pizza', '12.9716 N, 77.5946 E', 4.4, 'Pizza');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 5, 'Pasta Street', '12.9716 N, 77.5946 E', 4.8, 'Italian');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 6, 'Milano Ice Creams', '12.9716 N, 77.5946 E', 5.0, 'Desserts');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 7, 'Biryani Palace', '12.9716 N, 77.5946 E', 2.5, 'Biryani');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 8, 'Starbucks Coffee', '12.9716 N, 77.5946 E', 4.0, 'Beverages');
-INSERT INTO RESTAURANT VALUES (DEFAULT, 9, 'California Burrito', '12.9716 N, 77.5946 E', 3.8, 'Mexican');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 1, 'email@1email.com', 'McDonalds', '12.9716 N, 77.5946 E', 4.0, 'Burgers');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 2, 'email@2email.com', 'The Taste of Punjab', '12.9716 N, 77.5946 E', 4.8, 'North Indian');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 3, 'email@3email.com', 'Udupi Aahar', '12.9716 N, 77.5946 E', 3.2, 'South Indian');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 4, 'email@4email.com', 'Dominos Pizza', '12.9716 N, 77.5946 E', 4.4, 'Pizza');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 5, 'email@5email.com', 'Pasta Street', '12.9716 N, 77.5946 E', 4.8, 'Italian');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 6, 'email@6email.com', 'Milano Ice Creams', '12.9716 N, 77.5946 E', 5.0, 'Desserts');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 7, 'email@7email.com', 'Biryani Palace', '12.9716 N, 77.5946 E', 2.5, 'Biryani');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 8, 'email@8email.com', 'Starbucks Coffee', '12.9716 N, 77.5946 E', 4.0, 'Beverages');
+INSERT INTO RESTAURANT VALUES (DEFAULT, 9, 'email@9email.com', 'California Burrito', '12.9716 N, 77.5946 E', 3.8, 'Mexican');
 
 -- Customer Records
 INSERT INTO CUSTOMER VALUES (DEFAULT, 11, '12.9716 N, 77.5946 E', '12345678910', 'JP Nagar 4th Block', 'Vibha', 'vibha@spesueats.com');
@@ -59,15 +59,15 @@ INSERT INTO CUSTOMER VALUES (DEFAULT, 18, '12.9716 N, 77.5946 E', '34567891011',
 INSERT INTO CUSTOMER VALUES (DEFAULT, 19, '12.9716 N, 77.5946 E', '34567891011', 'Banashakari 6th Stage', 'Nikhil', 'nikhil@pesueats.com');
 
 -- Delivery Agent Records
-INSERT INTO DA VALUES (DEFAULT, '1111111111', 21, 'Rajkumar', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '2222222222', 22, 'Prakash', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '3333333333', 23, 'Venkatesh', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '4444444444', 24, 'Prassidha', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '5555555555', 25, 'Devaraj', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '6666666666', 26, 'Lokesh', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '7777777777', 27, 'Mahesh', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '8888888888', 28, 'Suresh', '12.9716 N, 77.5946 E');
-INSERT INTO DA VALUES (DEFAULT, '9999999999', 29, 'Rakesh', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email0@email.com', 21, 'Rajkumar', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email1@email.com', 22, 'Prakash', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email2@email.com', 23, 'Venkatesh', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email3@email.com', 24, 'Prassidha', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email4@email.com', 25, 'Devaraj', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email5@email.com', 26, 'Lokesh', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email6@email.com', 27, 'Mahesh', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email7@email.com', 28, 'Suresh', '12.9716 N, 77.5946 E');
+INSERT INTO DA VALUES (DEFAULT, 'email8@email.com', 29, 'Rakesh', '12.9716 N, 77.5946 E');
 
 -- Menu Item Records
 INSERT INTO MENU_ITEM VALUES (DEFAULT, 1, 'McVeggie Burger', 100.0, NULL, 'Classic Burgers');
