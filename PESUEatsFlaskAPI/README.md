@@ -414,6 +414,49 @@ Specific Views:
       }
       ```
 
+9. Get cart id 
+   - Endpoint: `/getcartid`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "cartid": 1
+         },
+      ]
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+10. Create new cart 
+   - Endpoint: `/createnewcart`
+   - Token: `required`
+   - Method: `POST`
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "message": "Successfully created cart", "cartid": 1
+         },
+      ]
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
 ### Restaurant endpoints
 
 1. Sign up a new restaurant
