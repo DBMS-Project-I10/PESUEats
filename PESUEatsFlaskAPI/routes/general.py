@@ -145,7 +145,10 @@ def signin():
             }, 
             os.environ['SECRET_KEY']
         )  
-        return jsonify({'token' : token}) 
+        return jsonify({
+            'token' : token,
+            'role': user['roles']
+        }) 
 
 
     response = Response(
