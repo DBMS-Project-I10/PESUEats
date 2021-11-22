@@ -230,7 +230,25 @@ def signin():
     return response
     # return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
+@cust_bp.route('/getcartid', methods=["GET"])
+@token_required
+def getcartid(current_cust):
+    custid = request.args.get('custid')
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
 
+    cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
+    # TODO: Figure out how to add cartids
+    cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
+    cartid = cur.fetchone()['cartid']
+    con.commit()
+
+    response = Response(
+            response=json.dumps({"message": "Successfully created cart", "cartid": cartid}),
+            mimetype='application/json',
+            status=200
+        )
+    return response
 
 @cust_bp.route('/addtocart', methods=["POST"])
 @token_required
