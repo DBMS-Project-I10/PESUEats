@@ -421,11 +421,9 @@ Specific Views:
    - On success: `Status 200`
 
       ```json
-      [
-         {
-            "cartid": 1
-         },
-      ]
+      {
+         "cartid": 1
+      },
       ```
 
    - On error: `Status 400`
@@ -443,11 +441,9 @@ Specific Views:
    - On success: `Status 200`
 
       ```json
-      [
-         {
-            "message": "Successfully created cart", "cartid": 1
-         },
-      ]
+      {
+         "message": "Successfully created cart", "cartid": 1
+      },
       ```
 
    - On error: `Status 400`
