@@ -60,6 +60,64 @@
       }
       ```
 
+2. Get current orders
+
+   - Endpoint: `/orders/current`
+   - Token: `required`
+   - Method: `GET`
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "oid": "order id",
+         "ofromrid": "restaurant id",
+         "odaid": "da id",
+         "otocartid": "cart id",
+         "otocartcustid": "customer id",
+         "oeta": "timestamp",
+         "ostatus": "order status",
+         "oplaceddatetime": "timestamp"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+3. Get previous orders
+
+   - Endpoint: `/orders/history`
+   - Token: `required`
+   - Method: `GET`
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "oid": "order id",
+         "ofromrid": "restaurant id",
+         "odaid": "da id",
+         "otocartid": "cart id",
+         "otocartcustid": "customer id",
+         "oeta": "timestamp",
+         "ostatus": "order status",
+         "oplaceddatetime": "timestamp"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
 ### Customer endpoints
 
 1. Sign up a new customer
@@ -289,6 +347,78 @@
             "iprice": 100.0
          },
       ]
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+### Restaurant endpoints
+
+1. Sign up a new restaurant
+
+   - Endpoint: `/signup/restaurant`
+   - Token: `not required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "name": "name:required:string",               
+         "email": "email@email.com:required:string",
+         "password": "password:required:string",     
+         "location": "location:required:string",
+         "cuisine": "cuisine:optional:string"
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "rname": "restaurant name",
+         "remail": "restaurant email",
+         "rlocation": "restaurant location",
+         "rcuisine": "restaurant cuisine"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+### Delivery Agent endpoints
+
+1. Sign up a new delivery agent
+
+   - Endpoint: `/signup/da`
+   - Token: `not required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "name": "name:required:string",               
+         "email": "email@email.com:required:string",
+         "password": "password:required:string"
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "daemail": "da email",
+         "daname": "da name"
+      }
       ```
 
    - On error: `Status 400`
