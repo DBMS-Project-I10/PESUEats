@@ -118,6 +118,28 @@
       }
       ```
 
+4. Get user profile 
+   - Endpoint: `/myprofile`
+   - Token: `required`
+   - Method: `GET`
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "name": "name",
+         "email": "email"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
 ### Customer endpoints
 
 1. Sign up a new customer
@@ -165,7 +187,8 @@
 
       ```json
       {
-         "itemid": "itemid:required:int"
+         "itemid": "itemid:required:int",
+         "cartid": "cartid:required:int"
       }
       ```
 
@@ -195,7 +218,8 @@
 
       ```json
       {
-         "itemid": "itemid:required:int"
+         "itemid": "itemid:required:int",
+         "cartid": "cartid:required:int"
       }
       ```
 
@@ -394,6 +418,48 @@
          "message": "error message"
       }
       ```
+ 
+2. Change status to `PREPARING`
+   - Endpoint: `/changestatus/preparing`
+   - Token: `required`
+   - Method: `POST`
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "message": "Successfully Delivered"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+3. Change status to `PICKED UP`
+   - Endpoint: `/changestatus/preparing`
+   - Token: `required`
+   - Method: `POST`
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "message": "Successfully Delivered"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
 
 ### Delivery Agent endpoints
 
@@ -418,6 +484,27 @@
       {
          "daemail": "da email",
          "daname": "da name"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+2. Change status to delivered 
+   - Endpoint: `/changestatus/delivered`
+   - Token: `required`
+   - Method: `POST`
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "message": "Successfully Delivered"
       }
       ```
 
