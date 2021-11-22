@@ -42,6 +42,14 @@ def get_pg_conn(*, dbname=None, user=None, host=None, password=None):
 def is_init():
     return appconfig.config['APP_CONFIG']['init']
 
+def validate_dict(d):
+    """
+    Checks if any of the json fields is empty
+    """
+    for k in d:
+        if d[k] == '':
+            raise ValueError("Json is invalid (empty strings).")
+    
 
 def token_required(f):
     """

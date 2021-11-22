@@ -1,10 +1,8 @@
 from flask import Flask
 import psycopg2
 
-from app.helper import get_pg_conn
 
-
-from routes import cust_bp, da_bp, general_bp
+from routes import cust_bp, da_bp, general_bp, rest_bp
 
 from routes.services import api_bp
 
@@ -22,5 +20,6 @@ def create_app(test_config=None):
     app.register_blueprint(da_bp)
     app.register_blueprint(cust_bp)
     app.register_blueprint(general_bp)
+    app.register_blueprint(rest_bp)
     return app
 

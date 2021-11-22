@@ -12,8 +12,7 @@ from flask import (
     Blueprint, 
     request, 
     json, 
-    Response, 
-    make_response, 
+    Response,
     jsonify
 )
 
@@ -93,7 +92,7 @@ def getprevorders(cur_user):
 
 
 @general_bp.route('/signin', methods=['POST'])
-def signin():
+def signin(): 
     """
     Sign in a user
 

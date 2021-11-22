@@ -16,7 +16,7 @@ from flask import (
     jsonify
 )
 
-from app.helper import get_pg_conn, get_cust_user, token_required
+from app.helper import get_pg_conn, get_cust_user, token_required, validate_dict
 
 #  url_prefix='/api'
 
@@ -28,15 +28,6 @@ cust_bp = Blueprint('customer', __name__)
 def signup():
     """
     Sign up/register a new customer
-
-    user details in the form
-    {
-        "name": ,
-        "email": ,
-        "password": , (hashed?)
-        "phone": ,
-        "addr": , -> optional
-    }
     """
     user_details = request.json
     public_id = str(uuid.uuid4())
@@ -47,7 +38,10 @@ def signup():
     try:
 
         # Check if necessary fields in post request
-        if not user_details or not ({'email', 'phone', 'name', 'password'} <= user_details.keys()):
+
+        required_fields = {'email', 'phone', 'name', 'password'}
+
+        if not user_details or not (required_fields <= user_details.keys()):
             response = Response(
                 response=json.dumps({
                     "message": "Missing a required parameter (email, phone, name or password)",
@@ -55,7 +49,10 @@ def signup():
                 content_type='application/json',
                 status=400
             )
-            return response
+            return response     
+
+        # Checks if dict has eny empty strings
+        validate_dict(dict((k, user_details[k]) for k in required_fields))
 
         # Make sure phone number can be converted to int
         phone = None
@@ -174,37 +171,46 @@ def addtocart(current_cust):
         )
         return response
 
-    # Creating new cart if not present
-    if 'cartid' not in reqbody.keys():
-        cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
-        # TODO: Figure out how to add cartids
-        cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
-        cartid = cur.fetchone()['cartid']
+    try:
+
+        # Creating new cart if not present
+        if 'cartid' not in reqbody.keys():
+            cur.execute(f'''update cart set CartStatus = 'INACTIVE' where cartcustid = {custid};''')
+            cur.execute(f'''insert into cart values (default, {custid}, 'ACTIVE', 0, 0, 25.0) returning cartid''')
+            cartid = cur.fetchone()['cartid']
+            con.commit() 
+        else:
+            cartid = reqbody["cartid"] 
+        
+        if 'quantity' in reqbody.keys():
+            quantity = reqbody['quantity']
+        else:
+            quantity = 1
+
+        #TODO : Figure out how to validate all items being added to cart are from the same restaurant (Might use Triggers and Functions)
+
+        cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {custid}, {quantity});')
+        # When menu item is added into cart, triggers and fucntions defined in create.sql automatically update cart value and tax amounts 
+
+        
         con.commit() 
-    else:
-        cartid = reqbody["cartid"] 
-    
-    if 'quantity' in reqbody.keys():
-        quantity = reqbody['quantity']
-    else:
-        quantity = 1
-
-    #TODO : Figure out how to validate all items being added to cart are from the same restaurant (Might use Triggers and Functions)
-
-    cur.execute(f'insert into menu_item_in_cart values ({reqbody["itemid"]}, {cartid}, {custid}, {quantity});')
-    # When menu item is added into cart, triggers and fucntions defined in create.sql automatically update cart value and tax amounts 
-
-    
-    con.commit() 
-
-    cur.close()
-    con.close()
-    
-    response = Response(
-            response=json.dumps({"message": "Successfully added to cart", "cartid": cartid}),
+        
+        response = Response(
+                response=json.dumps({"message": "Successfully added to cart", "cartid": cartid}),
+                mimetype='application/json',
+                status=200
+            )
+    except:
+        response = Response(
+            response=json.dumps({"message": "Error in requiest body."}),
             mimetype='application/json',
-            status=200
+            status=400
         )
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
     return response
 
 @cust_bp.route('/removefromcart', methods=["POST"])
@@ -232,7 +238,7 @@ def removefromcart(current_cust):
     con.close()
     
     response = Response(
-            response=json.dumps({"message": "Successfully removed to cart"}),
+            response=json.dumps({"message": "Successfully removed from cart"}),
             mimetype='application/json',
             status=200
         )
@@ -241,6 +247,9 @@ def removefromcart(current_cust):
 @cust_bp.route('/showcart')
 @token_required
 def showcart(current_cust):
+    """
+    Show all items in a cart
+    """
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
 
@@ -248,34 +257,39 @@ def showcart(current_cust):
     # custid = request.args.get('custid')
     cartid = request.args.get('cartid')
 
-    if cartid is None and custid is None:
+    if cartid is None or custid is None:
         response = Response(
-            response=json.dumps({"message": "CustId and CartId not present"}),
+            response=json.dumps({"message": "CustId or CartId not present"}),
             mimetype='application/json',
             status=400
         )
+        cur.close()
+        con.close()
         return response
         
-    if cartid is not None:
-        cur.execute(f'SELECT Iid, Iname, Iprice, MIQuantity FROM MENU_ITEM m, MENU_ITEM_IN_CART mc WHERE m.Iid = mc.MIid AND mc.MICartId = {cartid};')
-        res = cur.fetchall() 
-        response = Response(
-            response=json.dumps(res),
-            mimetype='application/json',
-            status=200
-        )
-        return response
     
-    # Add logic for handling if onlu custid passed and cartid not passed. Find the active cart for that customer 
-    else: 
-        pass
+    cur.execute(f'SELECT Iid, Iname, Iprice, MIQuantity FROM MENU_ITEM m, MENU_ITEM_IN_CART mc WHERE m.Iid = mc.MIid AND mc.MICartId = {cartid};')
+    res = cur.fetchall() 
+    response = Response(
+        response=json.dumps(res),
+        mimetype='application/json',
+        status=200
+    )
 
     cur.close()
     con.close()
 
+    return response
+    
+
+    
+
 @cust_bp.route('/placeorder', methods=["POST"])
 @token_required
 def placeorder(current_cust):
+    """
+    Place an order
+    """
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
 
@@ -288,12 +302,14 @@ def placeorder(current_cust):
     # custid = request.args.get('custid')
     # cartid = request.args.get('cartid')
 
-    if cartid is None and custid is None:
+    if cartid is None or custid is None:
         response = Response(
             response=json.dumps({"message": "CustId and CartId not present"}),
             mimetype='application/json',
             status=400
         )
+        cur.close() 
+        con.close()
         return response
         
     if cartid is None:
