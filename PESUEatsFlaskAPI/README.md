@@ -461,6 +461,66 @@
       }
       ```
 
+2. Add a new menu item
+
+   - Endpoint: `/addmenuitem`
+   - Token: `required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "itemname": "itemname:required:string",               
+         "price": "price:required:float",
+         "desc": "desc:required:string",     
+         "category": "category:required:string"
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "iid": 1,
+         "icategory": "Dessert",
+         "idescription": "Cold dessert",
+         "iname": "Ice cream",
+         "iprice": 12.25
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+3. Delete menu item from restaurant
+
+   - Endpoint: `/delmenuitem?iid=<iid>`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200` (deleted item)
+
+      ```json
+      {
+         "icategory": "Dessert",
+         "idescription": "Cold dessert",
+         "iname": "Ice cream",
+         "iprice": 12.25
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
 ### Delivery Agent endpoints
 
 1. Sign up a new delivery agent

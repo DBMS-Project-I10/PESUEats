@@ -12,8 +12,7 @@ from flask import (
     Blueprint, 
     request, 
     json, 
-    Response, 
-    jsonify
+    Response
 )
 
 from app.helper import get_pg_conn, token_required, validate_dict
@@ -195,4 +194,120 @@ def changestatustopickedup(cur_user):
         mimetype='application/json',
         status = 200
     )
+    return response
+    
+@rest_bp.route('/addmenuitem', methods=["POST"])
+@token_required
+def addmenuitem(current_rest):
+    """
+    Add a menu item to the restaurant's menu items
+
+    {
+        "itemname": 
+        "price":
+        "desc":
+        "category":
+    }
+    """
+
+    con = None
+    cur = None
+
+    menu_data = request.json
+
+    try:
+        con = get_pg_conn(user=current_rest['roles'])
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        rid = current_rest['rid']
+
+        price = menu_data['price']
+
+        if type(price) == str:
+            price = float(price)
+
+        query = f"""INSERT INTO MENU_ITEM VALUES (
+            default, {rid}, '{menu_data['itemname']}', 
+            {price}, '{menu_data['desc']}',
+            '{menu_data['category']}'
+        ) RETURNING Iid, IName, IPrice, IDescription, ICategory;
+        """
+        cur.execute(query)
+        item = cur.fetchone()
+        con.commit() 
+
+        response = Response(
+            response=json.dumps(item, indent=2),
+            mimetype='application/json',
+            status=200
+        )
+    
+    except Exception as e:
+        response = Response(
+            response=json.dumps({
+                "message": "Error in request body/not authorised.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        print(e)
+
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
+    return response
+
+@rest_bp.route('/delmenuitem', methods=["GET"])
+@token_required
+def delmenuitem(current_rest):
+    """
+    Delete a menu item from the restaurant's menu items
+
+    /delmenuitem?iid=<iid>
+    """
+
+    con = None
+    cur = None
+
+
+    try:
+        con = get_pg_conn(user=current_rest['roles'])
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        rid = current_rest['rid']
+
+        iid = request.args.get("iid")
+
+        query = f"""SELECT IName, IPrice, IDescription, ICategory from
+        MENU_ITEM WHERE IinMenuRid = {rid} and Iid = {iid}
+        ;
+        """
+        cur.execute(query)        
+        item = cur.fetchone()
+
+        query = f"""DELETE FROM MENU_ITEM WHERE IinMenuRid = {rid} and Iid = {iid};"""
+        cur.execute(query)     
+        con.commit()    
+        
+        response = Response(
+            response=json.dumps(item, indent=2),
+            mimetype='application/json',
+            status=200
+        )
+
+    except Exception as e:
+        response = Response(
+            response=json.dumps({
+                "message": "Error in request/params.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        print(e)
+
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
     return response
