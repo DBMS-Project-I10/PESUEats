@@ -16,7 +16,7 @@ from flask import (
     jsonify
 )
 
-from app.helper import get_pg_conn, get_cust_user, token_required
+from app.helper import get_pg_conn, token_required
 
 da_bp = Blueprint('da', __name__)
 
@@ -216,3 +216,22 @@ def signin():
     # return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
 
+@da_bp.route('/changestatus/delivered', methods=["POST"])
+def changestatus():
+    con = get_pg_conn()
+    cur = con.cursor(cursor_factory=RealDictCursor)
+    reqbody = request.json 
+
+    daid = reqbody['daid']
+
+    cur.execute(f'''update food_order set ostatus = "DELIVERED" where odaid = {daid} and ostatus = "PICKED UP";''')
+    con.commit()
+
+    cur.close() 
+    con.close() 
+
+    response = Response(
+        response=json.dumps({"message": "Successfully Delivered"}),
+        mimetype='application/json'
+    )
+    return response

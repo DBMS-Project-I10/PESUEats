@@ -323,6 +323,7 @@ def showcart(current_cust):
     cur = con.cursor(cursor_factory=RealDictCursor)
 
     custid = current_cust['custid']
+    # custid = request.args.get('custid')
     cartid = request.args.get('cartid')
 
     if cartid is None and custid is None:
@@ -350,14 +351,20 @@ def showcart(current_cust):
     cur.close()
     con.close()
 
-@cust_bp.route('/placeorder', methods=["GET"])
+@cust_bp.route('/placeorder', methods=["POST"])
 @token_required
 def placeorder(current_cust):
     con = get_pg_conn(user=get_cust_user())
     cur = con.cursor(cursor_factory=RealDictCursor)
 
-    custid = request.args.get('custid')
-    cartid = request.args.get('cartid')
+    reqbody = request.json 
+
+    # custid = reqbody['custid']
+    custid = current_cust['custid']
+    cartid = reqbody['cartid']
+
+    # custid = request.args.get('custid')
+    # cartid = request.args.get('cartid')
 
     if cartid is None and custid is None:
         response = Response(
@@ -451,3 +458,40 @@ def get_menuitems(current_cust):
     )
     return response
     return json.dumps(items, indent=2)
+
+# @cust_bp.route('/orders/customer/current', methods=["GET"])
+# def getcurrentorders():
+#     con = get_pg_conn(user=get_cust_user())
+#     cur = con.cursor(cursor_factory=RealDictCursor)
+
+#     custid = request.args.get('custid')
+
+#     cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus != "DELIVERED";''')
+#     items = cur.fetchall() 
+#     cur.close() 
+#     con.close() 
+
+#     response = Response(
+#         response=json.dumps(items, indent=2),
+#         mimetype='application/json'
+#     )
+#     return response
+
+# @cust_bp.route('/orders/customer/history', methods=["GET"])
+# def getprevorders():
+#     con = get_pg_conn(user=get_cust_user())
+#     cur = con.cursor(cursor_factory=RealDictCursor)
+
+#     custid = request.args.get('custid')
+
+#     cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus = "DELIVERED";''')
+#     items = cur.fetchall() 
+#     cur.close() 
+#     con.close() 
+
+#     response = Response(
+#         response=json.dumps(items, indent=2),
+#         mimetype='application/json'
+#     )
+#     return response
+    
