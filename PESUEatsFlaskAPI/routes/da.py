@@ -16,7 +16,7 @@ from flask import (
     jsonify
 )
 
-from app.helper import get_pg_conn, token_required
+from app.helper import get_pg_conn, validate_dict
 
 da_bp = Blueprint('da', __name__)
 
@@ -27,9 +27,9 @@ def signup():
 
     user details in the form
     {
-        "name": ,
-        "email": ,
-        "password": (hashed?)
+        "name": , -> required
+        "email": , -> required
+        "password": -> required
     }
     """
     user_details = request.json
@@ -48,6 +48,9 @@ def signup():
                 status=400
             )
             return response
+
+        # Checks if dict has eny empty strings
+        validate_dict(user_details)
         
         email = user_details['email']
 
@@ -124,83 +127,6 @@ def signup():
     if con is not None:
         con.close()
     return response
-
-
-@da_bp.route('/signin/da', methods=['POST'])
-def signin():
-    """
-    Sign in a delivery agent
-
-    user details in the form
-    {
-        "username": (phone number),
-        "password": , (hashed?)
-    }
-    """
-    data = request.json
-
-    if not data or not data['username'] or not data['password']:  
-        response = Response(
-            response=json.dumps({
-                "message": 'Basic realm: "login required"',
-            }), 
-            content_type='application/json',
-            status=400
-        )
-        return response
-
-    con = get_pg_conn()
-    cur = con.cursor(cursor_factory=RealDictCursor)
-
-    query = f"""SELECT daid FROM da 
-    WHERE daphone='{data['username']}';
-    """
-    cur.execute(query)
-
-    da = cur.fetchone()
-    daid = None
-
-    # If user does not exist
-    if da is None or da['daid'] is None:
-        response = Response(
-            response=json.dumps({
-                "message": "User does not exist. Please sign up.",
-            }), 
-            content_type='application/json',
-            status=400
-        )
-        return response
-
-    else:
-        daid = da['daid']
-
-    query = f"""SELECT * FROM app_users 
-    WHERE username={daid};
-    """
-
-    cur.execute(query)
-    current_user = cur.fetchone()
-
-    if current_user['password'] == data['password']:
-        # if check_password_hash(current_user.password, data['password']):  
-        token = jwt.encode(
-            {
-                'public_id': current_user['public_id'], 
-                'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-            }, 
-            os.environ['SECRET_KEY']
-        )  
-        return jsonify({'token' : token}) 
-
-    response = Response(
-            response=json.dumps({
-                "message": "Incorrect username or password.",
-            }), 
-            content_type='application/json',
-            status=400
-        )
-    return response
-    # return make_response('could not verify',  401, {'WWW.Authentication': 'Basic realm: "login required"'})
 
 
 @da_bp.route('/changestatus/delivered', methods=["POST"])

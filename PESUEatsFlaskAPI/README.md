@@ -27,6 +27,39 @@
 
 ## Endpoints
 
+### General endpoints
+
+1. Sign in an existing user
+
+   - Endpoint: `/signin`
+   - Token: `not required`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "username": "email@email.com:required:string",
+         "password": "password:required:string"
+      }
+      ```
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "token": "token",
+         "role": "customer/da/restaurant"
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
 ### Customer endpoints
 
 1. Sign up a new customer
@@ -38,7 +71,7 @@
 
       ```json
       {
-         "name": "name:optional:string",               
+         "name": "name:required:string",               
          "email": "email@email.com:required:string",
          "password": "password:required:string",     
          "phone": "1111111111:required:string",
@@ -65,37 +98,7 @@
       }
       ```
 
-2. Sign in an existing customer
-
-   - Endpoint: `/signin/customer`
-   - Token: `not required`
-   - Method: `POST`
-   - Form format:
-
-      ```json
-      {
-         "username": "email@email.com:required:string",
-         "password": "password:required:string"
-      }
-      ```
-
-   - On success: `Status 200`
-
-      ```json
-      {
-         "token": "token"
-      }
-      ```
-
-   - On error: `Status 400`
-
-      ```json
-      {
-         "message": "error message"
-      }
-      ```
-
-3. Add an item to cart
+2. Add an item to cart
 
    - Endpoint: `/addtocart`
    - Token: `required`
@@ -125,7 +128,7 @@
       }
       ```
 
-4. Remove an item from cart
+3. Remove an item from cart
 
    - Endpoint: `/removefromcart`
    - Token: `required`
@@ -134,7 +137,7 @@
 
       ```json
       {
-         
+         "itemid": "itemid:required:int"
       }
       ```
 
@@ -142,7 +145,7 @@
 
       ```json
       {
-         
+         "message": "Successfully removed from cart"
       }
       ```
 
@@ -154,17 +157,25 @@
       }
       ```
 
-5. Show all items in a cart
+4. Show all items in a cart
 
-   - Endpoint: `/showcart`
+   - Endpoint: `/showcart?cartid=<cartid>`
    - Token: `required`
    - Method: `GET`
    - On success: `Status 200`
 
       ```json
-      {
-         
-      }
+      [
+         {
+            "iid": "item id",
+            "iname": "item name",
+            "iprice": "item price",
+            "miquantity": "quantity"
+         },
+         {
+            "and so on": ""
+         }
+      ]
       ```
 
    - On error: `Status 400`
@@ -175,16 +186,24 @@
       }
       ```
 
-6. Place order
+5. Place order
 
    - Endpoint: `/placeorder`
    - Token: `required`
-   - Method: `GET`
+   - Method: `POST`
+   - Form format:
+
+      ```json
+      {
+         "cartid": "cartid:required:int"
+      }
+      ```
+
    - On success: `Status 200`
 
       ```json
       {
-         
+         "message": "Successfully placed order <oid>"
       }
       ```
 
@@ -196,7 +215,7 @@
       }
       ```
 
-7. Get a list of all the restaurants
+6. Get a list of all the restaurants
 
    - Endpoint: `/restaurants`
    - Token: `required`
@@ -224,7 +243,7 @@
       }
       ```
 
-8. Get all the menu items of all restaurants
+7. Get all the menu items of all restaurants
 
    - Endpoint: `/menuitems`
    - Token: `required`
@@ -252,7 +271,7 @@
       }
       ```
 
-9. Get all the menu items of a single restaurant
+8. Get all the menu items of a single restaurant
 
    - Endpoint: `/menuitems?rid={rid}`
    - Token: `required`
