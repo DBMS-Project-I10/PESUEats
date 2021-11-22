@@ -32,9 +32,9 @@ def getcurrentorders(cur_user):
     daid = None 
     rid = None 
 
-    if cur_user['roles'] == 'cust':
+    if cur_user['roles'] == 'customer':
         custid = cur_user['custid']
-    elif cur_user['roles'] == 'rest':
+    elif cur_user['roles'] == 'restaurant':
         rid = cur_user['rid'] 
     elif cur_user['roles'] == 'da':
         daid = cur_user['daid'] 
@@ -66,9 +66,9 @@ def getprevorders(cur_user):
     daid = None 
     rid = None 
 
-    if cur_user['roles'] == 'cust':
+    if cur_user['roles'] == 'customer':
         custid = cur_user['custid']
-    elif cur_user['roles'] == 'rest':
+    elif cur_user['roles'] == 'restaurant':
         rid = cur_user['rid'] 
     elif cur_user['roles'] == 'da':
         daid = cur_user['daid'] 
