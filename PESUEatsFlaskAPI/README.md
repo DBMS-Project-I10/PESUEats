@@ -8,19 +8,13 @@
 
 2. Configurate the app by editing `config.ini`
 
-3. Source the environment variables by running
-
-   ```shell
-   source variables.sh
-   ```
-
-4. Start the flask app server by running
+3. Start the flask app server by running
 
    ```shell
    sh run.sh
    ```
 
-5. If you want to setup your initial PostgresqlDB configuration, set `init` to `true` in `config.ini`, like this:
+4. If you want to setup your initial PostgresqlDB configuration, set `init` to `true` in `config.ini`, like this:
 
    ```shell
    [APP_CONFIG]
