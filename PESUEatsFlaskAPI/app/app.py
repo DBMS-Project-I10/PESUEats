@@ -4,7 +4,7 @@ import psycopg2
 from app.helper import get_pg_conn
 
 
-from routes import cust_bp
+from routes import cust_bp, da_bp
 
 from routes.services import api_bp
 
@@ -18,6 +18,8 @@ psycopg2.extensions.register_type(DEC2FLOAT)
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.register_blueprint(api_bp)
+    
+    app.register_blueprint(da_bp)
     app.register_blueprint(cust_bp)
     return app
 

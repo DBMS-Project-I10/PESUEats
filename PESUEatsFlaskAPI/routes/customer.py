@@ -41,99 +41,115 @@ def signup():
     user_details = request.json
     public_id = str(uuid.uuid4())
 
-    # Check if necessary fields in post request
-    if not ({'email', 'phone', 'name', 'password'} <= user_details.keys()):
-        response = Response(
-            response=json.dumps({
-                "message": "Missing a required parameter (email, phone, name or password)",
-            }), 
-            content_type='application/json',
-            status=400
-        )
-        return response
+    con = None
+    cur = None
 
-    # Make sure phone number can be converted to int
-    phone = None
     try:
-        phone = int(user_details['phone'])
-    except Exception as e:
-        response = Response(
-            response=json.dumps({
-                "message": "Phone number not a valid phone number",
-            }), 
-            content_type='application/json',
-            status=400
-        )
-        return response
 
-    # Check if email already registered (we will use 
-    # only email and not phone number) for simplicity
-    con = get_pg_conn()
+        # Check if necessary fields in post request
+        if not user_details or not ({'email', 'phone', 'name', 'password'} <= user_details.keys()):
+            response = Response(
+                response=json.dumps({
+                    "message": "Missing a required parameter (email, phone, name or password)",
+                }), 
+                content_type='application/json',
+                status=400
+            )
+            return response
 
-    cur = con.cursor(cursor_factory=RealDictCursor)
-    email = user_details['email']
-    # Check if user already exists
-    query = f"""SELECT * FROM CUSTOMER 
-        WHERE custemail = '{email}';
-    """
-    cur.execute(query)
-    
-    if cur.fetchone() is None:
-        if 'addr' in user_details.keys():
-            addr = user_details['addr']
-        else:
-            addr = 'null'
+        # Make sure phone number can be converted to int
+        phone = None
+        try:
+            phone = int(user_details['phone'])
+        except Exception as e:
+            response = Response(
+                response=json.dumps({
+                    "message": "Phone number not a valid phone number",
+                }), 
+                content_type='application/json',
+                status=400
+            )
+            return response
 
-        # First create a wallet entry
-        query = f"""INSERT INTO WALLET VALUES (
-            default, 0) RETURNING WID
-        ;"""
-        cur.execute(query)
-        wid = cur.fetchone()['wid']
-        
-        # Insert new user into customer
-        query = f"""INSERT INTO CUSTOMER VALUES (
-            default, {wid}, null, {phone}, 
-            '{addr}', '{user_details['name']}', '{user_details['email']}'
-        ) RETURNING custid;"""
-        cur.execute(query)
-        custid = cur.fetchone()['custid']
-        
-        # Insert into app_users
-        query = f"""INSERT INTO APP_USERS VALUES (
-            '{public_id}',
-            '{custid}',
-            '{user_details['password']}',
-            'customer'
-        );"""
-        cur.execute(query)
+        # Check if email already registered (we will use 
+        # only email and not phone number) for simplicity
+        con = get_pg_conn()
+        cur = con.cursor(cursor_factory=RealDictCursor)
 
-        # Commit changes
-        con.commit()
-
-        # Return the customer record inserted
-        query = f"""SELECT CUSTPHONE, CUSTADDR, CUSTNAME, CUSTEMAIL FROM CUSTOMER 
-            WHERE CUSTEMAIL = '{user_details['email']}';
+        email = user_details['email']
+        # Check if user already exists
+        query = f"""SELECT * FROM CUSTOMER 
+            WHERE custemail = '{email}';
         """
-        cur.execute(query)        
-        item = cur.fetchone()
-        response = Response(
-            response=json.dumps(item, indent=2),
-            mimetype='application/json',
-            status=200
-        )
+        cur.execute(query)
+        
+        if cur.fetchone() is None:
+            if 'addr' in user_details.keys():
+                addr = user_details['addr']
+            else:
+                addr = 'null'
 
-    else:
+            # First create a wallet entry
+            query = f"""INSERT INTO WALLET VALUES (
+                default, 0) RETURNING WID
+            ;"""
+            cur.execute(query)
+            wid = cur.fetchone()['wid']
+            
+            # Insert new user into customer
+            query = f"""INSERT INTO CUSTOMER VALUES (
+                default, {wid}, null, '{phone}', 
+                '{addr}', '{user_details['name']}', '{user_details['email']}'
+            ) RETURNING custid;"""
+            cur.execute(query)
+            custid = cur.fetchone()['custid']
+            
+            # Insert into app_users
+            query = f"""INSERT INTO APP_USERS VALUES (
+                '{public_id}',
+                '{custid}',
+                '{user_details['password']}',
+                'customer'
+            );"""
+            cur.execute(query)
+
+            # Commit changes
+            con.commit()
+
+            # Return the customer record inserted
+            query = f"""SELECT CUSTPHONE, CUSTADDR, CUSTNAME, CUSTEMAIL FROM CUSTOMER 
+                WHERE CUSTEMAIL = '{user_details['email']}';
+            """
+            cur.execute(query)        
+            item = cur.fetchone()
+            response = Response(
+                response=json.dumps(item, indent=2),
+                mimetype='application/json',
+                status=200
+            )
+
+        else:
+            response = Response(
+                response=json.dumps({
+                    "message": "User already exists. Please sign in.",
+                }), 
+                content_type='application/json',
+                status=400
+            )
+
+    except:
         response = Response(
             response=json.dumps({
-                "message": "User already exists. Please sign in.",
+                "message": "Error in request body.",
             }), 
             content_type='application/json',
             status=400
         )
 
-    cur.close()
-    con.close()
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
     return response
 
 
