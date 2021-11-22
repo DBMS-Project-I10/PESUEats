@@ -151,7 +151,7 @@ def changestatustopreparing(cur_user):
     
     rid = cur_user['rid']
     
-    cur.execute(f'''update food_order set ostatus = "PREPARING" where ofromrid = {rid} and ostatus = "PLACED";''')
+    cur.execute(f'''update food_order set ostatus = 'PREPARING' where ofromrid = {rid} and ostatus = 'PLACED';''')
     con.commit()
 
     cur.close() 
@@ -183,7 +183,7 @@ def changestatustopickedup(cur_user):
     
     rid = cur_user['rid']
     
-    cur.execute(f'''update food_order set ostatus = "PICKED UP" where ofromrid = {rid} and ostatus = "PREPARING";''')
+    cur.execute(f'''update food_order set ostatus = 'PICKED UP' where ofromrid = {rid} and ostatus = 'PREPARING';''')
     con.commit()
 
     cur.close() 

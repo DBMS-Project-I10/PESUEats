@@ -179,7 +179,7 @@ def getcartid(current_cust):
     con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
     
-    cur.execute(f'''select cartid from cart where cartcustid = {custid} and cartstatus = "ACTIVE";''')
+    cur.execute(f'''select cartid from cart where cartcustid = {custid} and cartstatus = 'ACTIVE';''')
     cartid = cur.fetchone()['cartid']
 
     response = Response(
@@ -358,7 +358,7 @@ def placeorder(current_cust):
         return response
         
     if cartid is None:
-        cartid = cur.execute(f'SELECT cartid FROM CART WHERE cartcustid = {custid} and cartstatus = "ACTIVE";')
+        cartid = cur.execute(f'''SELECT cartid FROM CART WHERE cartcustid = {custid} and cartstatus = 'ACTIVE';''')
 
     #Get Restaurant Id
     cur.execute(f'SELECT IinMenuRid from MENU_ITEM_IN_CART mc, MENU_ITEM m where micartid = {cartid} and micartcustid = {custid} and mc.miid = m.iid;')

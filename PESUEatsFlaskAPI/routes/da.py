@@ -148,7 +148,7 @@ def changestatus(cur_user):
     
     daid = cur_user['daid']
 
-    cur.execute(f'''update food_order set ostatus = "DELIVERED" where odaid = {daid} and ostatus = "PICKED UP";''')
+    cur.execute(f'''update food_order set ostatus = 'DELIVERED' where odaid = {daid} and ostatus = 'PICKED UP';''')
     con.commit()
 
     cur.close() 
