@@ -40,11 +40,11 @@ def getcurrentorders(cur_user):
         daid = cur_user['daid'] 
 
     if custid:
-        cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus != "DELIVERED";''')
+        cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus != 'DELIVERED'; ''')
     elif rid: 
-        cur.execute(f'''select * from food_order where ofromrid = {rid} and ostatus != "DELIVERED";''')
+        cur.execute(f'''select * from food_order where ofromrid = {rid} and ostatus != 'DELIVERED'; ''')
     elif daid: 
-        cur.execute(f'''select * from food_order where odaid = {daid} and ostatus != "DELIVERED";''')
+        cur.execute(f'''select * from food_order where odaid = {daid} and ostatus != 'DELIVERED'; ''')
 
     items = cur.fetchall() 
     cur.close() 
@@ -74,11 +74,11 @@ def getprevorders(cur_user):
         daid = cur_user['daid'] 
 
     if custid:
-        cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus = "DELIVERED";''')
+        cur.execute(f'''select * from food_order where otocartcustid = {custid} and ostatus = 'DELIVERED'; ''')
     elif rid: 
-        cur.execute(f'''select * from food_order where ofromrid = {rid} and ostatus = "DELIVERED";''')
+        cur.execute(f'''select * from food_order where ofromrid = {rid} and ostatus = 'DELIVERED'; ''')
     elif daid: 
-        cur.execute(f'''select * from food_order where odaid = {daid} and ostatus = "DELIVERED";''')
+        cur.execute(f'''select * from food_order where odaid = {daid} and ostatus = 'DELIVERED'; ''')
 
     items = cur.fetchall() 
     cur.close() 
