@@ -280,9 +280,7 @@ def showcart(current_cust):
     con.close()
 
     return response
-    
-
-    
+  
 
 @cust_bp.route('/placeorder', methods=["POST"])
 @token_required
