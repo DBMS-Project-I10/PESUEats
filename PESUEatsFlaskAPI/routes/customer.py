@@ -209,6 +209,7 @@ def addtocart(current_cust):
             mimetype='application/json',
             status=400
         )
+        print('No item ID')
         return response
 
     try:
@@ -247,17 +248,18 @@ def addtocart(current_cust):
                 mimetype='application/json',
                 status=200
             )
-    except:
+    except Exception as e:
         response = Response(
             response=json.dumps({"message": "Error in requiest body."}),
             mimetype='application/json',
             status=400
         )
+        print(e)
     if cur is not None:
         cur.close()
     if con is not None:
         con.close()
-
+    print(reqbody)
     return response
 
 @cust_bp.route('/removefromcart', methods=["POST"])
@@ -277,6 +279,7 @@ def removefromcart(current_cust):
         )
         return response
 
+    print(reqbody)
     cur.execute(f'delete from menu_item_in_cart where miid = {reqbody["itemid"]} and micartid = {reqbody["cartid"]} and micartcustid = {custid};')
     # When menu item is added into cart, triggers and fucntions defined in create.sql automatically update cart value and tax amounts 
     con.commit() 
@@ -335,7 +338,7 @@ def placeorder(current_cust):
     """
     Place an order
     """
-    con = get_pg_conn(user=get_cust_user())
+    con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
 
     reqbody = request.json 
@@ -365,18 +368,22 @@ def placeorder(current_cust):
     rid = cur.fetchone()['iinmenurid']
 
     # Find free DAs 
-    cur.execute(f'''SELECT DISTINCT DAId from DELIVERY_AGENT EXCEPT SELECT DISTINCT ODAId FROM FOOD_ORDER WHERE Ostatus != 'DELIVERED'; ''')
+    cur.execute(f'''SELECT DISTINCT DAId from DA EXCEPT SELECT DISTINCT ODAId FROM FOOD_ORDER WHERE Ostatus != 'DELIVERED'; ''')
     #Pick the first free DA
     daid = cur.fetchone()['daid']
 
     try:
-        cur.execute(f'''insert into food_order values (default, {rid}, {daid}, {cartid}, {custid}, NULL, 'PLACED', NOW()) returning oid;''')
-    except Exception:
+        query = f'''insert into food_order values (default, {rid}, {daid}, {cartid}, {custid}, NULL, 'PLACED', NOW()) returning oid;'''
+        print(query)
+        cur.execute(query)
+
+    except Exception as e:
         response = Response(
             response=json.dumps({"message": "KeyError. The Cartid and Custid is already present"}),
             mimetype='application/json',
             status=400
         )
+        print(e)
         return response
 
     oid = cur.fetchone()['oid']

@@ -130,13 +130,13 @@ def get_da():
     daname = request.args.get('daname')
 
     if daid is None and daname is None:
-        cur.execute("SELECT * FROM DELIVERY_AGENT;")
+        cur.execute("SELECT * FROM DA;")
     
     elif daname is None:
-        cur.execute(f"SELECT * FROM DELIVERY_AGENT WHERE CustId = {daid};")
+        cur.execute(f"SELECT * FROM DA WHERE CustId = {daid};")
     
     else:
-        cur.execute(f"SELECT * FROM DELIVERY_AGENT WHERE CustName = '{daname}';")
+        cur.execute(f"SELECT * FROM DA WHERE CustName = '{daname}';")
     
     items = cur.fetchall()
     cur.close()

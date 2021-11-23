@@ -46,7 +46,7 @@ def getcurrentorders(cur_user):
     elif daid: 
         cur.execute(f'''select * from food_order where odaid = {daid} and ostatus != 'DELIVERED'; ''')
 
-    items = cur.fetchall() 
+    items = cur.fetchone()
     cur.close() 
     con.close() 
 
