@@ -201,7 +201,7 @@ def addtocart(current_cust):
     cur = con.cursor(cursor_factory=RealDictCursor)
 
     custid = current_cust['custid']
-    cartid = current_cust['cartid']
+    cartid = reqbody['cartid']
 
     if 'itemid' not in reqbody.keys():
         response = Response(
