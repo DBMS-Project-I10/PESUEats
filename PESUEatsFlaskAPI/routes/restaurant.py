@@ -135,10 +135,16 @@ def signup():
 @rest_bp.route('/changestatus/preparing', methods=["POST"])
 @token_required
 def changestatustopreparing(cur_user):
+    """
+    {
+        "oid": "order id"
+    }
+    """
     con = get_pg_conn(user = "restaurant", password = "1234")
     cur = con.cursor(cursor_factory=RealDictCursor)
-    # reqbody = request.json 
+    reqbody = request.json 
 
+    oid = reqbody['oid']
     # daid = reqbody['daid']
 
     if cur_user['role'] != 'restaurant':
@@ -151,7 +157,7 @@ def changestatustopreparing(cur_user):
     
     rid = cur_user['rid']
     
-    cur.execute(f'''update food_order set ostatus = 'PREPARING' where ofromrid = {rid} and ostatus = 'PLACED';''')
+    cur.execute(f'''update food_order set ostatus = 'PREPARING' where ofromrid = {rid} and oid = {oid} and ostatus = 'PLACED';''')
     con.commit()
 
     cur.close() 
@@ -169,9 +175,9 @@ def changestatustopreparing(cur_user):
 def changestatustopickedup(cur_user):
     con = get_pg_conn(user = "restaurant", password = "1234")
     cur = con.cursor(cursor_factory=RealDictCursor)
-    # reqbody = request.json 
+    reqbody = request.json 
 
-    # daid = reqbody['daid']
+    oid = reqbody['oid']
 
     if cur_user['role'] != 'restaurant':
         response = Response(
@@ -183,7 +189,7 @@ def changestatustopickedup(cur_user):
     
     rid = cur_user['rid']
     
-    cur.execute(f'''update food_order set ostatus = 'PICKED UP' where ofromrid = {rid} and ostatus = 'PREPARING';''')
+    cur.execute(f'''update food_order set ostatus = 'PICKED UP' where ofromrid = {rid} and ostatus = 'PREPARING' and oid = {oid};''')
     con.commit()
 
     cur.close() 
