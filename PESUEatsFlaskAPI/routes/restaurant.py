@@ -486,7 +486,7 @@ def showcart(current_rest):
     """
     Show all items in a cart
     """
-    con = get_pg_conn(user=current_rest['roles'])
+    con = get_pg_conn()
     cur = con.cursor(cursor_factory=RealDictCursor)
 
     # custid = current_rest['custid']
