@@ -138,7 +138,7 @@ def changestatus(cur_user):
 
     # daid = reqbody['daid']
 
-    if cur_user['role'] != 'da':
+    if cur_user['roles'] != 'da':
         response = Response(
             response=json.dumps({"message": "Unathorized access"}),
             mimetype='application/json',
