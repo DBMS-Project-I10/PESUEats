@@ -151,7 +151,8 @@ Specific Views:
       }
       ```
 
-4. Get user profile 
+4. Get user profile
+
    - Endpoint: `/myprofile`
    - Token: `required`
    - Method: `GET`
@@ -163,6 +164,35 @@ Specific Views:
          "name": "name",
          "email": "email"
       }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+5. Get all menu items of rest
+
+   - Endpoint: `/restmenuitems`
+   - Token: `required`
+   - Method: `GET`
+
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "icategory": "Tacos",
+            "idescription": "",
+            "iid": 22,
+            "iinmenurid": 9,
+            "iname": "Veg Taco",
+            "iprice": 100.0
+         }
+      ]
       ```
 
    - On error: `Status 400`

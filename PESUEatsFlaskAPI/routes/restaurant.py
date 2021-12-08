@@ -432,3 +432,50 @@ def getorderhistory(current_rest):
         con.close()
 
     return response
+
+@rest_bp.route('/restmenuitems', methods=["GET"])
+@token_required
+def restmenuitems(current_rest):
+    """
+    Get all menu items in a restaurant
+    """
+
+    con = None
+    cur = None
+
+
+    try:
+        con = get_pg_conn(user=current_rest['roles'])
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        rid = current_rest['rid']
+
+        iid = request.args.get("iid")
+
+        query = f"""SELECT * from MENU_ITEM WHERE IinMenuRid = {rid};
+        """
+        cur.execute(query)        
+        items = cur.fetchall()
+
+        
+        response = Response(
+            response=json.dumps(items, indent=2),
+            mimetype='application/json',
+            status=200
+        )
+
+    except Exception as e:
+        response = Response(
+            response=json.dumps({
+                "message": "Error in request/params.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        print(e)
+
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
+    return response
