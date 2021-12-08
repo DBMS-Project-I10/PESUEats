@@ -26,7 +26,7 @@ CREATE DOMAIN EMAIL_FIELD AS VARCHAR(30);
 CREATE TABLE app_users
 (
     public_id VARCHAR(50) UNIQUE,
-    username EMAIL_FIELD NOT NULL,
+    username EMAIL_FIELD UNIQUE,
     password VARCHAR(30) NOT NULL,
     roles VARCHAR(50)
 );

@@ -23,7 +23,7 @@ rest_bp = Blueprint('rest', __name__)
 @rest_bp.route('/signup/restaurant', methods=['POST'])
 def signup():
     """
-    Sign up/register a new customer
+    Sign up/register a new restaurant
 
     user details in the form
     {
@@ -144,21 +144,44 @@ def changestatustopreparing(cur_user):
     cur = con.cursor(cursor_factory=RealDictCursor)
     reqbody = request.json 
 
-    oid = reqbody['oid']
-    # daid = reqbody['daid']
-
-    if cur_user['role'] != 'restaurant':
+    try:
+        oid = reqbody['oid']
+    except:
         response = Response(
-            response=json.dumps({"message": "Unathorized access"}),
+            response=json.dumps({"message": "Order ID missing"}),
             mimetype='application/json',
             status = 400
         )
+        cur.close() 
+        con.close()
+        return response
+    # daid = reqbody['daid']
+
+    if cur_user['roles'] != 'restaurant':
+        response = Response(
+            response=json.dumps({"message": "Unauthorized access"}),
+            mimetype='application/json',
+            status = 400
+        )
+        cur.close() 
+        con.close()
         return response
     
     rid = cur_user['rid']
     
-    cur.execute(f'''update food_order set ostatus = 'PREPARING' where ofromrid = {rid} and oid = {oid} and ostatus = 'PLACED';''')
+    cur.execute(f'''update food_order set ostatus = 'PREPARING' where ofromrid = {rid} and oid = {oid} and ostatus = 'PLACED' returning *;''')
+    updated_record = cur.fetchone()
     con.commit()
+
+    if updated_record is None:
+        response = Response(
+            response=json.dumps({"message": "No such order exists"}),
+            mimetype='application/json',
+            status = 200
+        )
+        cur.close() 
+        con.close()
+        return response
 
     cur.close() 
     con.close() 
@@ -185,6 +208,8 @@ def changestatustopickedup(cur_user):
             mimetype='application/json',
             status = 400
         )
+        cur.close() 
+        con.close()
         return response
     
     rid = cur_user['rid']
@@ -193,7 +218,7 @@ def changestatustopickedup(cur_user):
     con.commit()
 
     cur.close() 
-    con.close() 
+    con.close()
 
     response = Response(
         response=json.dumps({"message": "Successfully updated status"}),
@@ -297,6 +322,96 @@ def delmenuitem(current_rest):
         
         response = Response(
             response=json.dumps(item, indent=2),
+            mimetype='application/json',
+            status=200
+        )
+
+    except Exception as e:
+        response = Response(
+            response=json.dumps({
+                "message": "Error in request/params.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        print(e)
+
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
+    return response
+
+@rest_bp.route('/restactivefoodorders', methods=["GET"])
+@token_required
+def getactiveorders(current_rest):
+    """
+    Get all active food orders for a restaurant
+    """
+
+    con = None
+    cur = None
+
+
+    try:
+        con = get_pg_conn(user=current_rest['roles'])
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        rid = current_rest['rid']
+
+
+        query = f"""SELECT * FROM FOOD_ORDER WHERE ofromrid={rid} and ostatus in ('PLACED', 'PREPARING', 'PICKED UP');
+        """
+        cur.execute(query)        
+        orders = cur.fetchall()
+
+        response = Response(
+            response=json.dumps(orders, indent=2),
+            mimetype='application/json',
+            status=200
+        )
+
+    except Exception as e:
+        response = Response(
+            response=json.dumps({
+                "message": "Error in request/params.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        print(e)
+
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
+    return response
+
+@rest_bp.route('/resthistory', methods=["GET"])
+@token_required
+def getorderhistory(current_rest):
+    """
+    Get order history for a restaurant
+    """
+
+    con = None
+    cur = None
+
+
+    try:
+        con = get_pg_conn(user=current_rest['roles'])
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        rid = current_rest['rid']
+
+
+        query = f"""SELECT * FROM FOOD_ORDER WHERE ofromrid={rid} and ostatus = 'DELIVERED';
+        """
+        cur.execute(query)        
+        orders = cur.fetchall()
+
+        response = Response(
+            response=json.dumps(orders, indent=2),
             mimetype='application/json',
             status=200
         )

@@ -533,7 +533,7 @@ Specific Views:
       }
       ```
 
-2. Add a new menu item
+4. Add a new menu item
 
    - Endpoint: `/addmenuitem`
    - Token: `required`
@@ -569,7 +569,7 @@ Specific Views:
       }
       ```
 
-3. Delete menu item from restaurant
+5. Delete menu item from restaurant
 
    - Endpoint: `/delmenuitem?iid=<iid>`
    - Token: `required`
@@ -583,6 +583,72 @@ Specific Views:
          "iname": "Ice cream",
          "iprice": 12.25
       }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+6. Show all active orders of a restaurant
+
+   - Endpoint: `/restactivefoodorders`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "odaid": 4,
+            "oeta": null,
+            "ofromrid": 9,
+            "oid": 1,
+            "oplaceddatetime": "Wed, 08 Dec 2021 18:43:41 GMT",
+            "ostatus": "PLACED",
+            "otocartcustid": 10,
+            "otocartid": 1
+         },
+         {
+            "and_so_on": ""
+         }
+      ]
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+7. Show order history of a restaurant
+
+   - Endpoint: `/resthistory`
+   - Token: `required`
+   - Method: `GET`
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "odaid": 4,
+            "oeta": null,
+            "ofromrid": 9,
+            "oid": 1,
+            "oplaceddatetime": "Wed, 08 Dec 2021 18:43:41 GMT",
+            "ostatus": "DELIVERED",
+            "otocartcustid": 10,
+            "otocartid": 1
+         },
+         {
+            "and_so_on": ""
+         }
+      ]
       ```
 
    - On error: `Status 400`
@@ -627,7 +693,8 @@ Specific Views:
       }
       ```
 
-2. Change status to delivered 
+2. Change status to delivered
+
    - Endpoint: `/changestatus/delivered`
    - Token: `required`
    - Method: `POST`
@@ -638,6 +705,66 @@ Specific Views:
       {
          "message": "Successfully Delivered"
       }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+3. Get current delivery
+
+   - Endpoint: `/daorder`
+   - Token: `required`
+   - Method: `GET`
+
+   - On success: `Status 200`
+
+      ```json
+      {
+         "odaid": 9,
+         "oeta": null,
+         "ofromrid": 9,
+         "oid": 1,
+         "oplaceddatetime": "Wed, 08 Dec 2021 18:43:41 GMT",
+         "ostatus": "PLACED",
+         "otocartcustid": 10,
+         "otocartid": 1
+      }
+      ```
+
+   - On error: `Status 400`
+
+      ```json
+      {
+         "message": "error message"
+      }
+      ```
+
+4. Get delivery history
+
+   - Endpoint: `/dahistory`
+   - Token: `required`
+   - Method: `GET`
+
+   - On success: `Status 200`
+
+      ```json
+      [
+         {
+            "odaid": 9,
+            "oeta": null,
+            "ofromrid": 9,
+            "oid": 1,
+            "oplaceddatetime": "Wed, 08 Dec 2021 18:43:41 GMT",
+            "ostatus": "DELIVERED",
+            "otocartcustid": 10,
+            "otocartid": 1
+         }
+      ]
       ```
 
    - On error: `Status 400`

@@ -159,3 +159,93 @@ def changestatus(cur_user):
         mimetype='application/json'
     )
     return response
+
+@da_bp.route('/daorder', methods=["GET"])
+@token_required
+def getcurrdelivery(cur_da):
+    """
+    Get da's current delivery
+    """
+
+    con = None
+    cur = None
+
+
+    try:
+        con = get_pg_conn(user=cur_da['roles'])
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        daid = cur_da['daid']
+
+
+        query = f"""SELECT * FROM FOOD_ORDER WHERE odaid={daid} and ostatus in ('PLACED', 'PREPARING', 'PICKED UP');
+        """
+        cur.execute(query)        
+        orders = cur.fetchone()
+
+        response = Response(
+            response=json.dumps(orders, indent=2),
+            mimetype='application/json',
+            status=200
+        )
+
+    except Exception as e:
+        response = Response(
+            response=json.dumps({
+                "message": "Error in request/params.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        print(e)
+
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
+    return response
+
+@da_bp.route('/dahistory', methods=["GET"])
+@token_required
+def getdahistory(cur_da):
+    """
+    Get da's history
+    """
+
+    con = None
+    cur = None
+
+
+    try:
+        con = get_pg_conn(user=cur_da['roles'])
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        daid = cur_da['daid']
+
+
+        query = f"""SELECT * FROM FOOD_ORDER WHERE odaid={daid} and ostatus = 'DELIVERED';
+        """
+        cur.execute(query)        
+        orders = cur.fetchall()
+
+        response = Response(
+            response=json.dumps(orders, indent=2),
+            mimetype='application/json',
+            status=200
+        )
+
+    except Exception as e:
+        response = Response(
+            response=json.dumps({
+                "message": "Error in request/params.",
+            }), 
+            content_type='application/json',
+            status=400
+        )
+        print(e)
+
+    if cur is not None:
+        cur.close()
+    if con is not None:
+        con.close()
+
+    return response
