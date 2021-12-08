@@ -129,7 +129,7 @@ def signup():
     return response
 
 
-@da_bp.route('/changestatus/delivered', methods=["POST"])
+@da_bp.route('/changestatus/delivered', methods=["GET"])
 @token_required
 def changestatus(cur_user):
     con = get_pg_conn(user = "da", password = "1234")
@@ -138,7 +138,7 @@ def changestatus(cur_user):
 
     # daid = reqbody['daid']
 
-    if cur_user['role'] != 'da':
+    if cur_user['roles'] != 'da':
         response = Response(
             response=json.dumps({"message": "Unathorized access"}),
             mimetype='application/json',
@@ -181,6 +181,9 @@ def getcurrdelivery(cur_da):
         """
         cur.execute(query)        
         orders = cur.fetchone()
+
+        if orders is None:
+            orders = {}
 
         response = Response(
             response=json.dumps(orders, indent=2),
