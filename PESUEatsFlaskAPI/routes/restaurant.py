@@ -360,7 +360,7 @@ def getactiveorders(current_rest):
         rid = current_rest['rid']
 
 
-        query = f"""SELECT * FROM FOOD_ORDER WHERE ofromrid={rid} and ostatus in ('PLACED', 'PREPARING', 'PICKED UP');
+        query = f"""SELECT * FROM FOOD_ORDER WHERE ofromrid={rid} and ostatus in ('PLACED', 'PREPARING');
         """
         cur.execute(query)        
         orders = cur.fetchall()
