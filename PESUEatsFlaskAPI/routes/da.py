@@ -129,7 +129,7 @@ def signup():
     return response
 
 
-@da_bp.route('/changestatus/delivered', methods=["POST"])
+@da_bp.route('/changestatus/delivered', methods=["GET"])
 @token_required
 def changestatus(cur_user):
     con = get_pg_conn(user = "da", password = "1234")
