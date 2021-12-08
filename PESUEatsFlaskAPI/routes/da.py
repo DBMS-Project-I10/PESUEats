@@ -182,9 +182,6 @@ def getcurrdelivery(cur_da):
         cur.execute(query)        
         orders = cur.fetchone()
 
-        if orders is None:
-            orders = {}
-
         response = Response(
             response=json.dumps(orders, indent=2),
             mimetype='application/json',
