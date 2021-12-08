@@ -202,7 +202,7 @@ def changestatustopickedup(cur_user):
 
     oid = reqbody['oid']
 
-    if cur_user['role'] != 'restaurant':
+    if cur_user['roles'] != 'restaurant':
         response = Response(
             response=json.dumps({"message": "Unathorized access"}),
             mimetype='application/json',
