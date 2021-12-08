@@ -294,42 +294,42 @@ def removefromcart(current_cust):
         )
     return response
 
-@cust_bp.route('/showcart')
-@token_required
-def showcart(current_cust):
-    """
-    Show all items in a cart
-    """
-    con = get_pg_conn(user=get_cust_user())
-    cur = con.cursor(cursor_factory=RealDictCursor)
+# @cust_bp.route('/showcart')
+# @token_required
+# def showcart(current_cust):
+#     """
+#     Show all items in a cart
+#     """
+#     con = get_pg_conn(user=get_cust_user())
+#     cur = con.cursor(cursor_factory=RealDictCursor)
 
-    custid = current_cust['custid']
-    # custid = request.args.get('custid')
-    cartid = request.args.get('cartid')
+#     custid = current_cust['custid']
+#     # custid = request.args.get('custid')
+#     cartid = request.args.get('cartid')
 
-    if cartid is None or custid is None:
-        response = Response(
-            response=json.dumps({"message": "CustId or CartId not present"}),
-            mimetype='application/json',
-            status=400
-        )
-        cur.close()
-        con.close()
-        return response
+#     if cartid is None or custid is None:
+#         response = Response(
+#             response=json.dumps({"message": "CustId or CartId not present"}),
+#             mimetype='application/json',
+#             status=400
+#         )
+#         cur.close()
+#         con.close()
+#         return response
         
     
-    cur.execute(f'SELECT Iid, Iname, Iprice, MIQuantity FROM MENU_ITEM m, MENU_ITEM_IN_CART mc WHERE m.Iid = mc.MIid AND mc.MICartId = {cartid};')
-    res = cur.fetchall() 
-    response = Response(
-        response=json.dumps(res),
-        mimetype='application/json',
-        status=200
-    )
+    # cur.execute(f'SELECT Iid, Iname, Iprice, MIQuantity FROM MENU_ITEM m, MENU_ITEM_IN_CART mc WHERE m.Iid = mc.MIid AND mc.MICartId = {cartid};')
+    # res = cur.fetchall() 
+    # response = Response(
+    #     response=json.dumps(res),
+    #     mimetype='application/json',
+    #     status=200
+    # )
 
-    cur.close()
-    con.close()
+    # cur.close()
+    # con.close()
 
-    return response
+    # return response
   
 
 @cust_bp.route('/placeorder', methods=["POST"])
